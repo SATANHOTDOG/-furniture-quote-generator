@@ -7,6 +7,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>家具庫存快速查詢與報價系統</title>
+<!-- 🔥 把 QR Code 掃描引擎接回來了 -->
+<script src="https://unpkg.com/html5-qrcode"></script>
+<!-- 截圖轉圖檔的黑魔法引擎 -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
 :root {
@@ -78,8 +81,6 @@ h1 { font-size: 1.5rem; color: var(--primary-color); margin-bottom: 5px; }
 .quote-customer-info { display: grid; grid-template-columns: 1fr; gap: 10px; margin-bottom: 20px; }
 .info-group { display: flex; align-items: flex-start; }
 .info-label { width: 50px; font-size: 0.9rem; color: #34495e; font-weight: bold; margin-top: 6px; }
-
-/* 🔥 改良：把所有備註欄變成自動長高的 textarea，徹底解決腰斬問題 */
 .info-input { flex: 1; border: none; border-bottom: 1px dashed #bdc3c7; font-size: 1rem; outline: none; background: transparent; color: #2c3e50; font-family: inherit; padding: 6px 4px; }
 .auto-textarea { width: 100%; flex: 1; border: none; border-bottom: 1px dashed #bdc3c7; background: transparent; font-family: inherit; font-size: 0.95rem; color: #2c3e50; padding: 6px 4px; resize: none; overflow: hidden; box-sizing: border-box; }
 .auto-textarea::placeholder { color: #95a5a6; }
@@ -176,7 +177,6 @@ h1 { font-size: 1.5rem; color: var(--primary-color); margin-bottom: 5px; }
             <div class="quote-items" id="quoteItemList"></div>
 
             <div class="quote-summary">
-                <!-- 🔥 版面優化：標題與金額在第一行，完整備註列在第二行 -->
                 <div style="margin-bottom: 10px;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                         <span style="color: #7f8c8d; font-weight: bold; font-size: 0.95rem;">相關費用</span>
@@ -499,7 +499,6 @@ function renderQuoteItems() {
         list.appendChild(div);
     });
     
-    // 強制讓所有 textarea 在渲染後自動調整高度
     setTimeout(() => {
         document.querySelectorAll('.auto-textarea').forEach(el => autoExpand(el));
     }, 10);
@@ -532,7 +531,6 @@ function calculateQuoteTotal() {
 function generateQuoteImage() {
     document.activeElement.blur(); 
     
-    // 隱藏所有沒填寫的 input 和 textarea 的提示文字，防止截圖出殘影
     const inputs = document.querySelectorAll('#quotePaper input, #quotePaper textarea');
     inputs.forEach(input => {
         input.setAttribute('value', input.value); 
@@ -551,7 +549,6 @@ function generateQuoteImage() {
         backgroundColor: "#ffffff",
         logging: false
     }).then(canvas => {
-        // 恢復刪除按鈕與提示字元
         document.querySelectorAll('.q-item-del').forEach(el => el.style.display = 'block');
         inputs.forEach(input => {
             if(input.dataset.ph) {
@@ -569,6 +566,9 @@ function generateQuoteImage() {
     });
 }
 
+// ==========================================
+// 📸 原生相機 QR Code 掃描解析引擎
+// ==========================================
 const html5QrCode = new Html5Qrcode("hiddenReader");
 document.getElementById('cameraBtn').addEventListener('click', () => {
     document.getElementById('qrInput').click(); 
@@ -578,12 +578,14 @@ document.getElementById('qrInput').addEventListener('change', event => {
     const file = event.target.files[0];
     const statusDiv = document.getElementById('scanStatus');
     statusDiv.style.display = 'block';
+    
     html5QrCode.scanFile(file, true).then(decodedText => {
         statusDiv.style.display = 'none';
         let targetSku = null;
         const pMatch = decodedText.match(/\/p\/(0\d{8})/i);
         const rMatch = decodedText.match(/RPage=.*?(0\d{8})(?=\D|$)/i);
         const blindMatch = decodedText.match(/(0\d{8})(?=\D|$)/);
+        
         if (pMatch && pMatch[1]) targetSku = pMatch[1];
         else if (rMatch && rMatch[1]) targetSku = rMatch[1];
         else if (blindMatch && blindMatch[1]) targetSku = blindMatch[1];
@@ -593,12 +595,14 @@ document.getElementById('qrInput').addEventListener('change', event => {
             searchBox.value = targetSku;
             searchBox.dispatchEvent(new Event('input'));
         } else {
-            alert("掃描成功，但這不是 SKU！\n系統抓到的妖孽是：" + decodedText);
+            alert("掃描成功，但這不是 SKU！\n系統抓到的妖孽是：" + decodedText + "\n\n(可能是拍到旁邊的廠商出貨條碼，請針對網址 QR Code 重新拍一次)");
         }
     }).catch(err => {
         statusDiv.style.display = 'none';
         alert("解析失敗！照片可能太糊、反光，或是根本沒拍到 QR Code。請重新對焦再拍一次。");
-    }).finally(() => { event.target.value = ''; });
+    }).finally(() => { 
+        event.target.value = ''; 
+    });
 });
 </script>
 </body>
