@@ -168,6 +168,16 @@ h1 { font-size: 1.5rem; color: var(--primary-color); margin-bottom: 5px; }
                 <span class="total-warning">* 以上總金額不包含運費/登高等相關費用</span>
             </div>
             
+            <!-- 🔥 優惠方案區塊 (可在程式碼這裡直接修改預設字，或在手機畫面上臨時修改) -->
+            <div style="margin-top: 20px; background: #e8f8f5; padding: 12px 15px; border-radius: 8px; border-left: 4px solid #1abc9c;">
+                <div style="font-weight: 900; color: #16a085; font-size: 0.95rem; margin-bottom: 5px;">🎉 目前門市優惠方案</div>
+                <textarea id="promoNote" class="auto-textarea" style="color: #2c3e50; font-size: 0.85rem; line-height: 1.5; font-weight: bold; padding: 0; border: none;" rows="4" oninput="autoExpand(this)">
+滿12,000折1,000
+滿50,000折6,000
+滿80,000以上直接打85折
+*特殊折扣及商品與出清品例外</textarea>
+            </div>
+            
             <div style="margin-top: 25px; padding-top: 15px; border-top: 1px solid #ecf0f1; font-size: 0.8rem; color: #7f8c8d; line-height: 1.5; text-align: justify;">
                 * 此報價單金額僅供初步參考，實際結帳價格將依當下檔期活動與系統定價為準。<br>
                 * 猶豫期過長可能導致商品絕版或價格異動，若需確認購買或保留庫存，請儘速電聯您的專屬家具顧問：蔡先生 (KOBE) 0983-881-494。
@@ -187,7 +197,9 @@ h1 { font-size: 1.5rem; color: var(--primary-color); margin-bottom: 5px; }
 // ==========================================
 // 💡 請將你部署好的 Google Apps Script URL 貼在這裡
 // ==========================================
-const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxrhh56MPO5Kw1kC3Ji66y3181amvj22KFRFhpz7lBDxKnZl0myQcuZxw0jzsPckIdILg/exec'; 
+const GAS_WEB_APP_URL = 'https:
+
+//script.google.com/macros/s /AKfycbxrhh56MP05Kw1kC3Ji66y3181amvj22KFR Fhpz71BDxKnZ10myQcuZxw0jzsPckIdILg/exec'; 
 const GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTC18jsseZH3TerLqZMzzkJc1uPjh2IVTktcs4DxiuEmpA_NRAnzKrgzZbV43FQtN8b7-vMlvv1BFGF/pub?gid=0&single=true&output=csv';
 
 function autoExpand(field) {
@@ -248,18 +260,15 @@ function parseCSVLine(line) {
     return values.map(v => v.replace(/^["']|["']$/g, ''));
 }
 
-// 🔥 強力復刻版：時間濾波引擎 (解決多重價格影分身)
 function getActiveShortestPromo(promoPriceStr, promoPeriodStr) {
     if (!promoPriceStr || !promoPeriodStr) return { price: '', period: '' };
     const prices = promoPriceStr.split('|').map(s => s.trim());
     const periods = promoPeriodStr.split('|').map(s => s.trim());
     
-    // 如果沒有切分符號，直接回傳
     if (prices.length !== periods.length || periods.length === 1) {
         return { price: prices[0] || '', period: periods[0] || '' };
     }
     
-    // 取得當下時間
     const now = new Date();
     let bestPromo = null;
     let minDuration = Infinity;
@@ -270,10 +279,8 @@ function getActiveShortestPromo(promoPriceStr, promoPeriodStr) {
             const start = new Date(parts[0].trim().replace(/\//g, '-') + "T00:00:00");
             const end = new Date(parts[1].trim().replace(/\//g, '-') + "T23:59:59");
             
-            // 判斷是否在檔期內
             if (now >= start && now <= end) {
                 const duration = end - start;
-                // 找出最短的檔期 (最精準的促銷)
                 if (duration < minDuration) {
                     minDuration = duration;
                     bestPromo = { price: prices[i], period: periods[i] };
@@ -281,7 +288,6 @@ function getActiveShortestPromo(promoPriceStr, promoPeriodStr) {
             }
         }
     }
-    // 如果找不到符合當下的檔期，回傳空值，讓系統自動抓原價
     return bestPromo || { price: '', period: '' };
 }
 
@@ -302,7 +308,6 @@ function filterAndRender() {
         return matchText && matchYangmei && matchShop;
     });
     
-    // 🔥 復刻版：顯示過濾筆數
     document.getElementById('dataCount').innerText = query || onlyYangmei || onlyShop 
         ? `過濾結果：${currentFiltered.length} 筆` 
         : `共載入 ${products.length} 筆商品資料`;
@@ -328,7 +333,6 @@ function renderProducts() {
         const h630Show = parseInt(getVal('HOLA630展示') || '0');
         const origPrice = getVal('一般售價') || '0';
         
-        // 🔥 復刻版：掛載時間濾波引擎處理促銷價
         let rawPromoPrice = getVal('促銷售價');
         if(rawPromoPrice === '#N/A' || rawPromoPrice === '0') rawPromoPrice = '';
         let rawPromoPeriod = getVal('促銷期間');
@@ -338,11 +342,9 @@ function renderProducts() {
         const promoPrice = activePromo.price;
         const promoPeriod = activePromo.period;
         
-        // 🔥 復刻版：身家調查欄位 (分類、廠商)
         const category = getVal('商品分類') || '無分類';
         const vendor = getVal('廠商') || '';
 
-        // 🔥 復刻版：生死狀態標籤 (D級與A級判斷)
         const statusRaw = getVal('商品狀態') || '';
         let statusHtml = '';
         if (statusRaw.toUpperCase() === 'D') {
@@ -353,7 +355,6 @@ function renderProducts() {
             statusHtml = `<span style="color: var(--text-muted);">${statusRaw}</span>`;
         }
         
-        // 🔥 復刻版：火力支援按鈕 (判斷有無照片提供外部連結)
         const hasPhoto = Object.values(p).some(val => typeof val === 'string' && val.includes('有照片'));
         const photoBtnHtml = hasPhoto
             ? `<a href="https://satanhotdog.github.io/hola-furniture-search/?q=${sku}" target="_blank" class="btn btn-img">圖片</a>`
@@ -377,7 +378,6 @@ function renderProducts() {
         ${promoPeriod ? `<div class="promo-period">⏱️ 最終檔期: ${promoPeriod}</div>` : ''}
         </div>
         
-        <!-- 🔥 復刻版：身家與狀態顯示區 -->
         <div class="info-row">
             <span>分類: ${category}</span>
             ${vendor ? `<span>廠商: ${vendor}</span>` : ''}
@@ -386,7 +386,6 @@ function renderProducts() {
         </div>
         
         <div>
-            <!-- 🔥 復刻版：官網與圖片按鈕 -->
             <div class="action-btns">
                 <a href="https://www.hola.com.tw/p/${sku}" target="_blank" class="btn btn-primary">官網</a>
                 ${photoBtnHtml}
@@ -400,7 +399,6 @@ function renderProducts() {
         container.appendChild(card);
     });
     
-    // 🔥 復刻版：無限深淵挖掘器 (載入更多按鈕)
     if (renderLimit < currentFiltered.length) {
         const btnDiv = document.createElement('div');
         btnDiv.style = "grid-column: 1/-1; text-align: center; padding: 10px;";
@@ -442,6 +440,8 @@ function toggleQuoteApp() {
         const d = new Date();
         document.getElementById('quoteDateDisplay').innerText = `結帳報價日期：${d.getFullYear()}/${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}`;
         renderQuoteItems();
+        // 確保所有 textarea（包含新加的優惠框）展開
+        setTimeout(() => document.querySelectorAll('.auto-textarea').forEach(el => autoExpand(el)), 10);
         app.style.display = 'flex';
     }
 }
@@ -449,7 +449,8 @@ function toggleQuoteApp() {
 function clearQuote() {
     if(confirm("確定要清空整張報價單嗎？")) {
         quoteCart = [];
-        document.querySelectorAll('.info-input, .auto-textarea').forEach(input => { input.value = ''; autoExpand(input); });
+        // 清空時不要清到優惠方案區塊
+        document.querySelectorAll('.info-input, #quotePaper .auto-textarea:not(#promoNote)').forEach(input => { input.value = ''; autoExpand(input); });
         document.getElementById('extraFeeInput').value = '0';
         renderQuoteItems();
         document.getElementById('cartCount').innerText = '0';
@@ -546,6 +547,12 @@ function prepareForCapture() {
             div.style.textAlign = el.style.textAlign || 'center';
             div.style.fontWeight = 'bold';
             div.style.color = el.classList.contains('q-input-price') ? '#e74c3c' : '#2c3e50';
+        } else if (el.id === 'promoNote') {
+            // 優惠區塊專屬處理
+            div.style.color = '#2c3e50';
+            div.style.fontSize = '0.85rem';
+            div.style.lineHeight = '1.5';
+            div.style.fontWeight = 'bold';
         } else {
             div.style.padding = '6px 4px';
             div.style.borderBottom = '1px dashed #bdc3c7';
