@@ -55,7 +55,6 @@ h1 { font-size: 1.5rem; color: var(--primary-color); margin-bottom: 5px; }
 .quote-canvas-area { padding: 20px 10px; display: flex; justify-content: center; }
 .quote-paper { background: #fff; width: 100%; max-width: 600px; padding: 25px 25px 40px 25px; border-radius: 8px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); }
 
-/* 🔥 修改標題 */
 .quote-header-title { text-align: center; font-size: 1.3rem; color: #1a252f; font-weight: 900; margin-bottom: 5px; border-bottom: 2px solid #1a252f; padding-bottom: 10px; }
 .quote-date { text-align: center; font-size: 0.8rem; color: #7f8c8d; margin-bottom: 20px; }
 .quote-customer-info { display: grid; grid-template-columns: 1fr; gap: 10px; margin-bottom: 20px; }
@@ -81,7 +80,6 @@ h1 { font-size: 1.5rem; color: var(--primary-color); margin-bottom: 5px; }
 .quote-summary { background: #f8f9fa; padding: 15px; border-radius: 8px; margin-top: 15px; }
 .summary-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 10px; }
 
-/* 🔥 總金額樣式與不含運費提示 */
 .summary-row.total { border-top: 1px solid #bdc3c7; padding-top: 15px; margin-top: 15px; display: flex; justify-content: space-between; align-items: baseline; font-size: 1.3rem; font-weight: 900; color: #e74c3c; }
 .total-warning { font-size: 0.75rem; color: #e74c3c; font-weight: normal; margin-top: 5px; text-align: right; width: 100%; display: block; }
 
@@ -90,7 +88,7 @@ h1 { font-size: 1.5rem; color: var(--primary-color); margin-bottom: 5px; }
 .result-hint { color: #fff; margin-top: 15px; font-size: 1.1rem; font-weight: bold; text-align: center; }
 .close-result { position: absolute; top: 20px; right: 20px; color: #fff; font-size: 2rem; background: none; border: none; cursor: pointer; }
 
-/* 完美替換輸入框的純文字標籤，確保字不被切斷 */
+/* 完美替換輸入框的純文字標籤 */
 .capture-clone { white-space: pre-wrap; word-break: break-word; color: #2c3e50; font-size: 0.95rem; line-height: 1.4; display: block; width: 100%; }
 .capture-clone-inline { display: inline-block; width: auto; padding: 0 5px; }
 </style>
@@ -137,7 +135,6 @@ h1 { font-size: 1.5rem; color: var(--primary-color); margin-bottom: 5px; }
     
     <div class="quote-canvas-area">
         <div class="quote-paper" id="quotePaper">
-            <!-- 🔥 修改了標題 -->
             <div class="quote-header-title">HOLA 台中大墩店 家具業務 KOBE 專屬報價單</div>
             <div class="quote-date" id="quoteDateDisplay">列印日期：自動生成</div>
             
@@ -160,11 +157,9 @@ h1 { font-size: 1.5rem; color: var(--primary-color); margin-bottom: 5px; }
                         <span style="color: #7f8c8d; font-weight: bold; font-size: 0.95rem;">相關費用</span>
                         <input type="number" id="extraFeeInput" class="q-input-price" style="color: #2c3e50;" value="0" oninput="calculateQuoteTotal()">
                     </div>
-                    <!-- 🔥 費用備註欄 -->
                     <textarea id="extraFeeNote" class="auto-textarea" placeholder="在此填寫費用明細 (例: 未達2萬基本運費 $1,500、無電梯登高費 $300)" rows="1" oninput="autoExpand(this)"></textarea>
                 </div>
                 
-                <!-- 🔥 總金額與警告標語 -->
                 <div class="summary-row total">
                     <span>商品總金額</span>
                     <span id="quoteGrandTotal">$0</span>
@@ -172,7 +167,6 @@ h1 { font-size: 1.5rem; color: var(--primary-color); margin-bottom: 5px; }
                 <span class="total-warning">* 以上總金額不包含運費/登高等相關費用</span>
             </div>
             
-            <!-- 🔥 新增免責聲明 -->
             <div style="margin-top: 25px; padding-top: 15px; border-top: 1px solid #ecf0f1; font-size: 0.8rem; color: #7f8c8d; line-height: 1.5; text-align: justify;">
                 * 此報價單金額僅供初步參考，實際結帳價格將依當下檔期活動與系統定價為準。<br>
                 * 猶豫期過長可能導致商品絕版或價格異動，若需確認購買或保留庫存，請儘速電聯您的專屬家具顧問：蔡先生 (KOBE) 0983-881-494。
@@ -189,9 +183,6 @@ h1 { font-size: 1.5rem; color: var(--primary-color); margin-bottom: 5px; }
 </div>
 
 <script>
-// ==========================================
-// 💡 請將你部署好的 Google Apps Script URL 貼在這裡
-// ==========================================
 const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzcXEH7UQIV09Tk6EuyTHbEPIltdKwa9XkbPr5LzLaysmZUGHYCFDZYTQ7qpcTnQzZe0Q/exec'; 
 const GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTC18jsseZH3TerLqZMzzkJc1uPjh2IVTktcs4DxiuEmpA_NRAnzKrgzZbV43FQtN8b7-vMlvv1BFGF/pub?gid=0&single=true&output=csv';
 
@@ -327,10 +318,6 @@ function showQR(sku) { document.getElementById('modalTitle').innerText = `${sku}
 function closeModal() { document.getElementById('qrModal').style.display = 'none'; }
 fetchProducts();
 
-// ==========================================
-// 🚀 報價單與 CRM 引擎
-// ==========================================
-
 function addToQuote(sku, name, price) {
     const exist = quoteCart.find(i => i.sku === sku);
     if (exist) exist.qty += 1;
@@ -395,15 +382,11 @@ function renderQuoteItems() {
     calculateQuoteTotal();
 }
 
-// 🔥 總金額只算商品，不再加上 extraFee
 function calculateQuoteTotal() {
     const itemsTotal = quoteCart.reduce((sum, item) => sum + (item.price * item.qty), 0);
     document.getElementById('quoteGrandTotal').innerText = `$${itemsTotal.toLocaleString()}`;
 }
 
-// ==========================================
-// 💡 修改 fetch 設定，徹底擊潰 CORS 阻擋
-// ==========================================
 function saveToCRM() {
     if(quoteCart.length === 0) return alert("報價單沒東西怎麼存？");
     if(!GAS_WEB_APP_URL || GAS_WEB_APP_URL.includes('YOUR_WEB_APP_URL_HERE')) return alert("請先填入你的 GAS Web App URL！");
@@ -427,10 +410,7 @@ function saveToCRM() {
 
     fetch(GAS_WEB_APP_URL, {
         method: 'POST',
-        // 核心修改：改用不被擋的傳統表單格式
-        headers: {
-            'Content-Type': 'text/plain;charset=utf-8',
-        },
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify(payload)
     }).then(res => res.json()).then(data => {
         if(data.status === 'success') {
@@ -446,18 +426,17 @@ function saveToCRM() {
 }
 
 // ==========================================
-// 🔥 終極版 DOM 抽換黑魔法 (防文字腰斬)
+// 🔥 終極版 DOM 抽換 + 防止滾動條截斷黑魔法
 // ==========================================
 function prepareForCapture() {
     document.activeElement.blur();
-    document.getElementById('internalInfoGroup').style.display = 'none'; // 隱藏暗黑備註
+    document.getElementById('internalInfoGroup').style.display = 'none'; 
     document.querySelectorAll('.q-item-del').forEach(el => el.style.display = 'none'); 
 
     document.querySelectorAll('#quotePaper input, #quotePaper textarea').forEach(el => {
         const div = document.createElement('div');
         div.className = 'capture-clone';
         
-        // 特例：如果是數量或價錢，讓它 inline 顯示
         if(el.classList.contains('q-input-num') || el.classList.contains('q-input-price')) {
             div.className += ' capture-clone-inline';
             div.style.textAlign = el.style.textAlign || 'center';
@@ -469,11 +448,8 @@ function prepareForCapture() {
             div.style.minHeight = el.offsetHeight + 'px';
         }
         
-        if(!el.value && el.placeholder) {
-            div.innerText = ''; 
-        } else {
-            div.innerText = el.value;
-        }
+        if(!el.value && el.placeholder) { div.innerText = ''; } 
+        else { div.innerText = el.value; }
 
         el.style.display = 'none';
         el.parentNode.insertBefore(div, el);
@@ -484,40 +460,62 @@ function restoreAfterCapture() {
     document.getElementById('internalInfoGroup').style.display = 'flex';
     document.querySelectorAll('.q-item-del').forEach(el => el.style.display = 'block');
     document.querySelectorAll('.capture-clone').forEach(el => el.remove());
-    document.querySelectorAll('#quotePaper input, #quotePaper textarea').forEach(el => {
-        el.style.display = '';
-    });
+    document.querySelectorAll('#quotePaper input, #quotePaper textarea').forEach(el => { el.style.display = ''; });
 }
 
 function generateQuoteImage() {
     prepareForCapture();
-    html2canvas(document.getElementById('quotePaper'), { scale: 2, backgroundColor: "#ffffff" }).then(canvas => {
+    const app = document.getElementById('quoteApp');
+    const originalScroll = app.scrollTop;
+    app.style.overflow = 'visible';
+
+    html2canvas(document.getElementById('quotePaper'), { 
+        scale: 2, 
+        backgroundColor: "#ffffff",
+        scrollY: -window.scrollY 
+    }).then(canvas => {
+        app.style.overflow = 'auto';
+        app.scrollTop = originalScroll;
         restoreAfterCapture();
         document.getElementById('resultImg').src = canvas.toDataURL("image/jpeg", 0.9);
         document.getElementById('resultOverlay').style.display = 'flex';
     });
 }
 
+// 🔥 PDF 截斷終極解法：動態畫布長度
 function exportPDF() {
     prepareForCapture();
-    // 確保抓取整張 quotePaper，避免遺漏底部免責聲明
+    
+    // 釋放外層容器的高度限制，讓 html2canvas 能抓到最底
+    const app = document.getElementById('quoteApp');
+    const originalScroll = app.scrollTop;
+    app.style.overflow = 'visible';
+
     const paper = document.getElementById('quotePaper');
+    
     html2canvas(paper, { 
         scale: 2, 
         backgroundColor: "#ffffff",
-        windowWidth: paper.scrollWidth,
-        windowHeight: paper.scrollHeight
+        scrollY: -window.scrollY
     }).then(canvas => {
+        // 抓完圖後馬上復原版面
+        app.style.overflow = 'auto';
+        app.scrollTop = originalScroll;
         restoreAfterCapture();
         
         const imgData = canvas.toDataURL("image/jpeg", 1.0);
         const { jsPDF } = window.jspdf;
-        const pdf = new jsPDF('p', 'mm', 'a4');
         
-        const pdfWidth = pdf.internal.pageSize.getWidth();
-        const imgProps = pdf.getImageProperties(imgData);
-        // 按比例縮放，確保寬度符合 A4
-        const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+        // 寬度鎖死在 A4 的 210mm，但高度由系統自己算
+        const pdfWidth = 210;
+        const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+        
+        // 🔥 放棄傳統 A4 規格，改用「無極限動態畫布」
+        const pdf = new jsPDF({
+            orientation: 'p',
+            unit: 'mm',
+            format: [pdfWidth, pdfHeight]
+        });
         
         pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
         
@@ -525,38 +523,6 @@ function exportPDF() {
         pdf.save(`HOLA大墩店報價單_${cName}.pdf`);
     });
 }
-
-const html5QrCode = new Html5Qrcode("hiddenReader");
-document.getElementById('cameraBtn').addEventListener('click', () => { document.getElementById('qrInput').click(); });
-document.getElementById('qrInput').addEventListener('change', event => {
-    if (event.target.files.length == 0) return;
-    const file = event.target.files[0];
-    const statusDiv = document.getElementById('scanStatus');
-    statusDiv.style.display = 'block';
-    
-    html5QrCode.scanFile(file, true).then(decodedText => {
-        statusDiv.style.display = 'none';
-        let targetSku = null;
-        const pMatch = decodedText.match(/\/p\/(0\d{8})/i);
-        const rMatch = decodedText.match(/RPage=.*?(0\d{8})(?=\D|$)/i);
-        const blindMatch = decodedText.match(/(0\d{8})(?=\D|$)/);
-        
-        if (pMatch && pMatch[1]) targetSku = pMatch[1];
-        else if (rMatch && rMatch[1]) targetSku = rMatch[1];
-        else if (blindMatch && blindMatch[1]) targetSku = blindMatch[1];
-        
-        if (targetSku) {
-            let searchBox = document.getElementById('searchInput');
-            searchBox.value = targetSku;
-            searchBox.dispatchEvent(new Event('input'));
-        } else {
-            alert("掃描成功，但這不是 SKU！\n系統抓到的妖孽是：" + decodedText);
-        }
-    }).catch(err => {
-        statusDiv.style.display = 'none';
-        alert("解析失敗！照片可能太糊、反光，或是根本沒拍到 QR Code。請重新對焦再拍一次。");
-    }).finally(() => { event.target.value = ''; });
-});
 </script>
 </body>
 </html>
