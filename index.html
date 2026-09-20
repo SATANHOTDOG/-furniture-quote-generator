@@ -8,7 +8,6 @@
 <title>家具庫存快速查詢與報價系統</title>
 <script src="https://unpkg.com/html5-qrcode"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<!-- 🔥 新增的存證信函級 PDF 產生引擎 -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 :root { --primary-color: #2c3e50; --accent-color: #e74c3c; --bg-color: #f8f9fa; --card-bg: #ffffff; --border-color: #e9ecef; --text-main: #333333; --text-muted: #6c757d; --success-color: #27ae60; }
@@ -54,18 +53,19 @@ h1 { font-size: 1.5rem; color: var(--primary-color); margin-bottom: 5px; }
 #quoteApp { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #f4f6f8; z-index: 2000; overflow-y: auto; flex-direction: column; }
 .quote-toolbar { position: sticky; top: 0; background: #fff; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; gap: 6px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); z-index: 2001; flex-wrap: wrap; }
 .quote-canvas-area { padding: 20px 10px; display: flex; justify-content: center; }
-.quote-paper { background: #fff; width: 100%; max-width: 600px; padding: 25px; border-radius: 8px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); }
-.quote-header-title { text-align: center; font-size: 1.4rem; color: #1a252f; font-weight: 900; margin-bottom: 5px; border-bottom: 2px solid #1a252f; padding-bottom: 10px; }
+.quote-paper { background: #fff; width: 100%; max-width: 600px; padding: 25px 25px 40px 25px; border-radius: 8px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); }
+
+/* 🔥 修改標題 */
+.quote-header-title { text-align: center; font-size: 1.3rem; color: #1a252f; font-weight: 900; margin-bottom: 5px; border-bottom: 2px solid #1a252f; padding-bottom: 10px; }
 .quote-date { text-align: center; font-size: 0.8rem; color: #7f8c8d; margin-bottom: 20px; }
 .quote-customer-info { display: grid; grid-template-columns: 1fr; gap: 10px; margin-bottom: 20px; }
 .info-group { display: flex; align-items: flex-start; }
 .info-label { width: 60px; font-size: 0.9rem; color: #34495e; font-weight: bold; margin-top: 6px; }
 
-/* 暗黑備註專屬樣式 (拍照時隱藏) */
 #internalInfoGroup { background: #fff3cd; padding: 8px; border-radius: 6px; border-left: 4px solid #f1c40f; margin-bottom: 15px; }
 #internalInfoGroup .info-label { color: #d35400; width: 80px; }
 
-.info-input { flex: 1; border: none; border-bottom: 1px dashed #bdc3c7; font-size: 1rem; outline: none; background: transparent; padding: 6px 4px; border-radius: 0; }
+.info-input { flex: 1; border: none; border-bottom: 1px dashed #bdc3c7; font-size: 1rem; outline: none; background: transparent; padding: 6px 4px; border-radius: 0; font-family: inherit; }
 .auto-textarea { width: 100%; flex: 1; border: none; border-bottom: 1px dashed #bdc3c7; background: transparent; font-family: inherit; font-size: 0.95rem; padding: 6px 4px; resize: none; overflow: hidden; border-radius: 0; }
 .auto-textarea::placeholder, .info-input::placeholder { color: #bdc3c7; }
 
@@ -79,15 +79,20 @@ h1 { font-size: 1.5rem; color: var(--primary-color); margin-bottom: 5px; }
 .q-input-price { width: 90px; border: 1px solid #bdc3c7; border-radius: 4px; text-align: right; color: var(--accent-color); font-weight: bold; padding: 4px; }
 .q-subtotal { flex: 1; text-align: right; font-weight: bold; color: #2c3e50; font-size: 1.1rem; }
 .quote-summary { background: #f8f9fa; padding: 15px; border-radius: 8px; margin-top: 15px; }
-.summary-row.total { border-top: 1px solid #bdc3c7; padding-top: 10px; margin-top: 10px; display: flex; justify-content: space-between; align-items: center; font-size: 1.3rem; font-weight: 900; color: #e74c3c; }
+.summary-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 10px; }
+
+/* 🔥 總金額樣式與不含運費提示 */
+.summary-row.total { border-top: 1px solid #bdc3c7; padding-top: 15px; margin-top: 15px; display: flex; justify-content: space-between; align-items: baseline; font-size: 1.3rem; font-weight: 900; color: #e74c3c; }
+.total-warning { font-size: 0.75rem; color: #e74c3c; font-weight: normal; margin-top: 5px; text-align: right; width: 100%; display: block; }
 
 #resultOverlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index: 3000; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
 #resultImg { max-width: 100%; max-height: 80vh; border-radius: 8px; box-shadow: 0 0 20px rgba(255,255,255,0.2); }
 .result-hint { color: #fff; margin-top: 15px; font-size: 1.1rem; font-weight: bold; text-align: center; }
 .close-result { position: absolute; top: 20px; right: 20px; color: #fff; font-size: 2rem; background: none; border: none; cursor: pointer; }
 
-/* 用來替換 input 避免被截斷的純文字標籤 */
-.capture-clone { white-space: pre-wrap; word-break: break-word; color: #2c3e50; }
+/* 完美替換輸入框的純文字標籤，確保字不被切斷 */
+.capture-clone { white-space: pre-wrap; word-break: break-word; color: #2c3e50; font-size: 0.95rem; line-height: 1.4; display: block; width: 100%; }
+.capture-clone-inline { display: inline-block; width: auto; padding: 0 5px; }
 </style>
 </head>
 <body>
@@ -112,7 +117,7 @@ h1 { font-size: 1.5rem; color: var(--primary-color); margin-bottom: 5px; }
 <div id="qrModal" class="modal" onclick="closeModal()">
 <div class="modal-content" onclick="event.stopPropagation()">
 <h3 id="modalTitle">掃描前往官網</h3>
-<img id="qrImage" src="" alt="QR Code" style="margin: 15px 0;">
+<img id="qrImage" src="" alt="QR Code" style="margin: 15px 0; max-width: 100%;">
 <button class="btn btn-secondary" style="width: 100%; margin-top: 10px;" onclick="closeModal()">關閉視窗</button>
 </div>
 </div>
@@ -125,20 +130,18 @@ h1 { font-size: 1.5rem; color: var(--primary-color); margin-bottom: 5px; }
     <div class="quote-toolbar">
         <button class="btn btn-secondary" style="flex: 0 0 60px;" onclick="toggleQuoteApp()">返回</button>
         <button class="btn btn-secondary" style="flex: 0 0 60px; background: #95a5a6; color: white;" onclick="clearQuote()">清空</button>
-        <!-- 🔥 新增儲存到 CRM 按鈕 -->
-        <button class="btn btn-primary" style="flex: 1; background: #27ae60;" onclick="saveToCRM()" id="btnSaveCRM">💾 存入試算表</button>
-        <!-- 🔥 新增輸出 PDF 按鈕 -->
+        <button class="btn btn-primary" style="flex: 1; background: #27ae60;" onclick="saveToCRM()" id="btnSaveCRM">💾 存試算表</button>
         <button class="btn btn-primary" style="flex: 0 0 60px; background: #8e44ad;" onclick="exportPDF()">PDF</button>
         <button class="btn btn-primary" style="flex: 0 0 60px; background: #e74c3c;" onclick="generateQuoteImage()">圖片</button>
     </div>
     
     <div class="quote-canvas-area">
         <div class="quote-paper" id="quotePaper">
-            <div class="quote-header-title">HOLA 台中大墩店 專屬報價單</div>
+            <!-- 🔥 修改了標題 -->
+            <div class="quote-header-title">HOLA 台中大墩店 家具業務 KOBE 專屬報價單</div>
             <div class="quote-date" id="quoteDateDisplay">列印日期：自動生成</div>
             
             <div class="quote-customer-info">
-                <!-- 🔥 暗黑備註欄 (截圖與轉 PDF 時會自動隱形) -->
                 <div class="info-group" id="internalInfoGroup">
                     <span class="info-label">🤫 資訊欄</span>
                     <textarea id="internalNote" class="auto-textarea" placeholder="輸入顧客特徵或對話重點... (不會出現在報價單上)" rows="1" oninput="autoExpand(this)" style="border-bottom: 1px dashed #d35400;"></textarea>
@@ -157,13 +160,22 @@ h1 { font-size: 1.5rem; color: var(--primary-color); margin-bottom: 5px; }
                         <span style="color: #7f8c8d; font-weight: bold; font-size: 0.95rem;">相關費用</span>
                         <input type="number" id="extraFeeInput" class="q-input-price" style="color: #2c3e50;" value="0" oninput="calculateQuoteTotal()">
                     </div>
+                    <!-- 🔥 費用備註欄 -->
                     <textarea id="extraFeeNote" class="auto-textarea" placeholder="在此填寫費用明細 (例: 未達2萬基本運費 $1,500、無電梯登高費 $300)" rows="1" oninput="autoExpand(this)"></textarea>
                 </div>
                 
+                <!-- 🔥 總金額與警告標語 -->
                 <div class="summary-row total">
-                    <span>總金額</span>
+                    <span>商品總金額</span>
                     <span id="quoteGrandTotal">$0</span>
                 </div>
+                <span class="total-warning">* 以上總金額不包含運費/登高等相關費用</span>
+            </div>
+            
+            <!-- 🔥 新增免責聲明 -->
+            <div style="margin-top: 25px; padding-top: 15px; border-top: 1px solid #ecf0f1; font-size: 0.8rem; color: #7f8c8d; line-height: 1.5; text-align: justify;">
+                * 此報價單金額僅供初步參考，實際結帳價格將依當下檔期活動與系統定價為準。<br>
+                * 猶豫期過長可能導致商品絕版或價格異動，若需確認購買或保留庫存，請儘速電聯您的專屬家具顧問：蔡先生 (KOBE) 0983-881-494。
             </div>
             
         </div>
@@ -369,11 +381,13 @@ function renderQuoteItems() {
             <div class="q-item-name">${item.name}</div>
             <div class="q-item-sku">SKU: ${item.sku}</div>
             <div class="q-item-calc">
-                <input type="number" class="q-input-num" value="${item.qty}" min="1" onchange="quoteCart[${index}].qty=parseInt(this.value)||1; renderQuoteItems();"> X
-                <input type="number" class="q-input-price" value="${item.price}" onchange="quoteCart[${index}].price=parseInt(this.value)||0; renderQuoteItems();"> =
+                <input type="number" class="q-input-num" value="${item.qty}" min="1" onchange="quoteCart[${index}].qty=parseInt(this.value)||1; renderQuoteItems();"> 
+                <span style="font-weight:bold; color:#7f8c8d;">X</span>
+                <input type="number" class="q-input-price" value="${item.price}" onchange="quoteCart[${index}].price=parseInt(this.value)||0; renderQuoteItems();"> 
+                <span style="font-weight:bold; color:#7f8c8d;">=</span>
                 <span class="q-subtotal">$${sub.toLocaleString()}</span>
             </div>
-            <textarea class="auto-textarea" placeholder="商品備註" rows="1" oninput="autoExpand(this)" onchange="quoteCart[${index}].note=this.value">${item.note}</textarea>
+            <textarea class="auto-textarea" placeholder="商品備註 (如: 尺寸/布色)" rows="1" oninput="autoExpand(this)" onchange="quoteCart[${index}].note=this.value">${item.note}</textarea>
         `;
         list.appendChild(div);
     });
@@ -381,15 +395,18 @@ function renderQuoteItems() {
     calculateQuoteTotal();
 }
 
+// 🔥 總金額只算商品，不再加上 extraFee
 function calculateQuoteTotal() {
-    const total = quoteCart.reduce((s, i) => s + (i.price * i.qty), 0) + (parseInt(document.getElementById('extraFeeInput').value) || 0);
-    document.getElementById('quoteGrandTotal').innerText = `$${total.toLocaleString()}`;
+    const itemsTotal = quoteCart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+    document.getElementById('quoteGrandTotal').innerText = `$${itemsTotal.toLocaleString()}`;
 }
 
-// 🔥 傳送到 Google 試算表 CRM
+// ==========================================
+// 💡 修改 fetch 設定，徹底擊潰 CORS 阻擋
+// ==========================================
 function saveToCRM() {
     if(quoteCart.length === 0) return alert("報價單沒東西怎麼存？");
-    if(GAS_WEB_APP_URL === 'YOUR_WEB_APP_URL_HERE') return alert("請先填入你的 GAS Web App URL！");
+    if(!GAS_WEB_APP_URL || GAS_WEB_APP_URL.includes('YOUR_WEB_APP_URL_HERE')) return alert("請先填入你的 GAS Web App URL！");
     
     const btn = document.getElementById('btnSaveCRM');
     btn.innerText = "傳送中..."; btn.disabled = true;
@@ -410,42 +427,48 @@ function saveToCRM() {
 
     fetch(GAS_WEB_APP_URL, {
         method: 'POST',
+        // 核心修改：改用不被擋的傳統表單格式
+        headers: {
+            'Content-Type': 'text/plain;charset=utf-8',
+        },
         body: JSON.stringify(payload)
     }).then(res => res.json()).then(data => {
         if(data.status === 'success') {
-            alert('✅ 報價單已成功存入你的私刑試算表！');
+            alert('✅ 報價單已成功存入雲端！');
         } else {
             alert('❌ 寫入失敗：' + data.message);
         }
     }).catch(err => {
-        alert('❌ 網路錯誤或跨網域被阻擋');
+        alert('❌ 網路連線錯誤，請確認網路狀態');
     }).finally(() => {
-        btn.innerText = "💾 存入試算表"; btn.disabled = false;
+        btn.innerText = "💾 存試算表"; btn.disabled = false;
     });
 }
 
 // ==========================================
-// 🔥 解決文字腰斬的「DOM 抽換黑魔法」
+// 🔥 終極版 DOM 抽換黑魔法 (防文字腰斬)
 // ==========================================
 function prepareForCapture() {
     document.activeElement.blur();
     document.getElementById('internalInfoGroup').style.display = 'none'; // 隱藏暗黑備註
-    document.querySelectorAll('.q-item-del').forEach(el => el.style.display = 'none'); // 隱藏刪除按鈕
+    document.querySelectorAll('.q-item-del').forEach(el => el.style.display = 'none'); 
 
-    // 關鍵！把所有 input / textarea 抽換成 div，徹底消滅行高渲染 BUG
     document.querySelectorAll('#quotePaper input, #quotePaper textarea').forEach(el => {
         const div = document.createElement('div');
-        div.className = 'capture-clone ' + el.className;
+        div.className = 'capture-clone';
         
-        // 複製樣式並確保文字換行
-        div.style.cssText = window.getComputedStyle(el).cssText;
-        div.style.padding = '6px 4px';
-        div.style.borderBottom = el.style.borderBottom;
-        div.style.whiteSpace = 'pre-wrap';
-        div.style.wordBreak = 'break-word';
-        div.style.minHeight = el.offsetHeight + 'px';
+        // 特例：如果是數量或價錢，讓它 inline 顯示
+        if(el.classList.contains('q-input-num') || el.classList.contains('q-input-price')) {
+            div.className += ' capture-clone-inline';
+            div.style.textAlign = el.style.textAlign || 'center';
+            div.style.fontWeight = 'bold';
+            div.style.color = el.classList.contains('q-input-price') ? '#e74c3c' : '#2c3e50';
+        } else {
+            div.style.padding = '6px 4px';
+            div.style.borderBottom = '1px dashed #bdc3c7';
+            div.style.minHeight = el.offsetHeight + 'px';
+        }
         
-        // 處理空值的佔位符號
         if(!el.value && el.placeholder) {
             div.innerText = ''; 
         } else {
@@ -466,7 +489,6 @@ function restoreAfterCapture() {
     });
 }
 
-// 產出圖片
 function generateQuoteImage() {
     prepareForCapture();
     html2canvas(document.getElementById('quotePaper'), { scale: 2, backgroundColor: "#ffffff" }).then(canvas => {
@@ -476,10 +498,16 @@ function generateQuoteImage() {
     });
 }
 
-// 產出律師函等級 PDF
 function exportPDF() {
     prepareForCapture();
-    html2canvas(document.getElementById('quotePaper'), { scale: 2, backgroundColor: "#ffffff" }).then(canvas => {
+    // 確保抓取整張 quotePaper，避免遺漏底部免責聲明
+    const paper = document.getElementById('quotePaper');
+    html2canvas(paper, { 
+        scale: 2, 
+        backgroundColor: "#ffffff",
+        windowWidth: paper.scrollWidth,
+        windowHeight: paper.scrollHeight
+    }).then(canvas => {
         restoreAfterCapture();
         
         const imgData = canvas.toDataURL("image/jpeg", 1.0);
@@ -488,6 +516,7 @@ function exportPDF() {
         
         const pdfWidth = pdf.internal.pageSize.getWidth();
         const imgProps = pdf.getImageProperties(imgData);
+        // 按比例縮放，確保寬度符合 A4
         const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
         
         pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
@@ -496,6 +525,38 @@ function exportPDF() {
         pdf.save(`HOLA大墩店報價單_${cName}.pdf`);
     });
 }
+
+const html5QrCode = new Html5Qrcode("hiddenReader");
+document.getElementById('cameraBtn').addEventListener('click', () => { document.getElementById('qrInput').click(); });
+document.getElementById('qrInput').addEventListener('change', event => {
+    if (event.target.files.length == 0) return;
+    const file = event.target.files[0];
+    const statusDiv = document.getElementById('scanStatus');
+    statusDiv.style.display = 'block';
+    
+    html5QrCode.scanFile(file, true).then(decodedText => {
+        statusDiv.style.display = 'none';
+        let targetSku = null;
+        const pMatch = decodedText.match(/\/p\/(0\d{8})/i);
+        const rMatch = decodedText.match(/RPage=.*?(0\d{8})(?=\D|$)/i);
+        const blindMatch = decodedText.match(/(0\d{8})(?=\D|$)/);
+        
+        if (pMatch && pMatch[1]) targetSku = pMatch[1];
+        else if (rMatch && rMatch[1]) targetSku = rMatch[1];
+        else if (blindMatch && blindMatch[1]) targetSku = blindMatch[1];
+        
+        if (targetSku) {
+            let searchBox = document.getElementById('searchInput');
+            searchBox.value = targetSku;
+            searchBox.dispatchEvent(new Event('input'));
+        } else {
+            alert("掃描成功，但這不是 SKU！\n系統抓到的妖孽是：" + decodedText);
+        }
+    }).catch(err => {
+        statusDiv.style.display = 'none';
+        alert("解析失敗！照片可能太糊、反光，或是根本沒拍到 QR Code。請重新對焦再拍一次。");
+    }).finally(() => { event.target.value = ''; });
+});
 </script>
 </body>
 </html>
