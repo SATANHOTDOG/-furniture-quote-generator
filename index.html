@@ -1,89 +1,73 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-<!-- 🔥 全新特製 Icon：沙發與鋼筆的完美結合 (Base64 SVG) -->
 <link rel="apple-touch-icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgZmlsbD0iIzJjM2U1MCIgcng9IjEwMCIvPjxyZWN0IHg9IjE1NiIgeT0iMTgwIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjE2MCIgcng9IjIwIiBmaWxsPSIjZWNmMGYxIi8+PHJlY3QgeD0iMTA2IiB5PSIyNzAiIHdpZHRoPSI1MCIgaGVpZ2h0PSIxMTAiIHJ4PSIxNSIgZmlsbD0iI2JkYzNjNyIvPjxyZWN0IHg9IjM1NiIgeT0iMjcwIiB3aWR0aD0iNTAiIGhlaWdodD0iMTEwIiByeD0iMTUiIGZpbGw9IiNiZGMzYzciLz48cmVjdCB4PSIxMDYiIHk9IjM0MCIgd2lkdGg9IjMwMCIgaGVpZ2h0PSI2MCIgcng9IjE1IiBmaWxsPSIjZmZmZmZmIi8+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMzIwLCAxMDApIHJvdGF0ZSgzNSkiPjxyZWN0IHg9IjAiIHk9IjMwIiB3aWR0aD0iNDAiIGhlaWdodD0iMTYwIiBmaWxsPSIjZjFjNDBmIi8+PHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjMwIiBmaWxsPSIjZTc0YzNjIiByeD0iNSIvPjxyZWN0IHg9IjAiIHk9IjIyIiB3aWR0aD0iNDAiIGhlaWdodD0iOCIgZmlsbD0iIzk1YTVhNiIvPjxwb2x5Z29uIHBvaW50cz0iMCwxOTAgNDAsMTkwIDIwLDI0MCIgZmlsbD0iI2YzOWMxMiIvPjxwb2x5Z29uIHBvaW50cz0iMTAsMjI3IDMwLDIyNyAyMCwyNDAiIGZpbGw9IiMyYzNlNTAiLz48L2c+PC9zdmc+">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgZmlsbD0iIzJjM2U1MCIgcng9IjEwMCIvPjxyZWN0IHg9IjE1NiIgeT0iMTgwIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjE2MCIgcng9IjIwIiBmaWxsPSIjZWNmMGYxIi8+PHJlY3QgeD0iMTA2IiB5PSIyNzAiIHdpZHRoPSI1MCIgaGVpZ2h0PSIxMTAiIHJ4PSIxNSIgZmlsbD0iI2JkYzNjNyIvPjxyZWN0IHg9IjM1NiIgeT0iMjcwIiB3aWR0aD0iNTAiIGhlaWdodD0iMTEwIiByeD0iMTUiIGZpbGw9IiNiZGMzYzciLz48cmVjdCB4PSIxMDYiIHk9IjM0MCIgd2lkdGg9IjMwMCIgaGVpZ2h0PSI2MCIgcng9IjE1IiBmaWxsPSIjZmZmZmZmIi8+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMzIwLCAxMDApIHJvdGF0ZSgzNSkiPjxyZWN0IHg9IjAiIHk9IjMwIiB3aWR0aD0iNDAiIGhlaWdodD0iMTYwIiBmaWxsPSIjZjFjNDBmIi8+PHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjMwIiBmaWxsPSIjZTc0YzNjIiByeD0iNSIvPjxyZWN0IHg9IjAiIHk9IjIyIiB3aWR0aD0iNDAiIGhlaWdodD0iOCIgZmlsbD0iIzk1YTVhNiIvPjxwb2x5Z29uIHBvaW50cz0iMCwxOTAgNDAsMTkwIDIwLDI0MCIgZmlsbD0iI2YzOWMxMiIvPjxwb2x5Z29uIHBvaW50cz0iMTAsMjI3IDMwLDIyNyAyMCwyNDAiIGZpbGw9IiMyYzNlNTAiLz48L2c+PC9zdmc+">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>家具庫存快速查詢與報價系統</title>
-<!-- 🔥 把 QR Code 掃描引擎接回來了 -->
 <script src="https://unpkg.com/html5-qrcode"></script>
-<!-- 截圖轉圖檔的黑魔法引擎 -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<!-- 🔥 新增的存證信函級 PDF 產生引擎 -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
-:root {
---primary-color: #2c3e50;
---accent-color: #e74c3c;
---bg-color: #f8f9fa;
---card-bg: #ffffff;
---border-color: #e9ecef;
---text-main: #333333;
---text-muted: #6c757d;
---success-color: #27ae60;
-}
+:root { --primary-color: #2c3e50; --accent-color: #e74c3c; --bg-color: #f8f9fa; --card-bg: #ffffff; --border-color: #e9ecef; --text-main: #333333; --text-muted: #6c757d; --success-color: #27ae60; }
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background-color: var(--bg-color); color: var(--text-main); padding: 15px; max-width: 1200px; margin: 0 auto; padding-bottom: 80px; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; background-color: var(--bg-color); color: var(--text-main); padding: 15px; max-width: 1200px; margin: 0 auto; padding-bottom: 80px; }
 header { text-align: center; margin-bottom: 20px; padding: 15px; background: var(--card-bg); border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
 h1 { font-size: 1.5rem; color: var(--primary-color); margin-bottom: 5px; }
 .subtitle { font-size: 0.85rem; color: var(--text-muted); }
 .search-container { position: sticky; top: 10px; z-index: 100; margin-bottom: 20px; background: var(--bg-color); padding-bottom: 10px; }
-.search-box { width: 100%; padding: 14px 20px; font-size: 1.1rem; border: 2px solid var(--primary-color); border-radius: 12px; outline: none; box-shadow: 0 4px 12px rgba(0,0,0,0.1); transition: all 0.2s ease; background: #ffffff; }
-.search-box:focus { border-color: var(--accent-color); box-shadow: 0 4px 16px rgba(231, 76, 60, 0.2); }
-.filter-bar { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 12px; padding: 0 5px; }
-.checkbox-container { display: flex; align-items: center; cursor: pointer; font-size: 0.95rem; color: var(--primary-color); font-weight: 600; user-select: none; }
-.checkbox-container input { margin-right: 6px; width: 18px; height: 18px; cursor: pointer; accent-color: var(--accent-color); }
-.status-bar { display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px; padding: 0 5px; }
+.search-box { width: 100%; padding: 14px 20px; font-size: 1.1rem; border: 2px solid var(--primary-color); border-radius: 12px; outline: none; transition: all 0.2s ease; }
+.filter-bar { margin-top: 12px; display: flex; gap: 12px; }
+.checkbox-container { display: flex; align-items: center; cursor: pointer; font-size: 0.95rem; color: var(--primary-color); font-weight: 600; }
+.checkbox-container input { margin-right: 6px; width: 18px; height: 18px; }
+.status-bar { display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px; }
 .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 15px; }
-.card { background: var(--card-bg); border-radius: 12px; padding: 16px; border: 1px solid var(--border-color); box-shadow: 0 2px 6px rgba(0,0,0,0.03); display: flex; flex-direction: column; justify-content: space-between; }
+.card { background: var(--card-bg); border-radius: 12px; padding: 16px; border: 1px solid var(--border-color); display: flex; flex-direction: column; justify-content: space-between; }
 .card-header { border-bottom: 1px solid var(--border-color); padding-bottom: 10px; margin-bottom: 10px; }
 .sku-tag { display: inline-block; background: #eef2f7; color: var(--primary-color); font-weight: bold; font-size: 0.85rem; padding: 3px 8px; border-radius: 4px; margin-bottom: 6px; }
 .item-name { font-size: 1.05rem; font-weight: 600; color: #1a252f; line-height: 1.4; }
 .stock-section { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; background: #f1f3f5; padding: 10px; border-radius: 8px; margin-bottom: 12px; text-align: center; }
 .stock-box { display: flex; flex-direction: column; }
-.stock-title { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 2px; }
+.stock-title { font-size: 0.75rem; color: var(--text-muted); }
 .stock-val { font-size: 1.1rem; font-weight: bold; color: var(--primary-color); }
 .stock-val.has-stock { color: var(--success-color); }
 .price-section { margin-bottom: 12px; }
 .price-row { display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; margin-bottom: 4px; }
-.price-label { color: var(--text-muted); }
 .price-orig { text-decoration: line-through; color: #95a5a6; }
 .price-promo { color: var(--accent-color); font-weight: bold; font-size: 1.1rem; }
-.promo-period { font-size: 0.75rem; color: var(--accent-color); background: #fdf2f2; padding: 4px 8px; border-radius: 4px; margin-top: 4px; line-height: 1.3; font-weight: bold; }
 .info-row { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 12px; display: flex; justify-content: space-between; }
-.action-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 6px; }
-.action-btns-bottom { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
-.btn { flex: 1; text-align: center; padding: 10px 0; border-radius: 6px; font-size: 0.9rem; text-decoration: none; font-weight: bold; transition: background 0.2s; cursor: pointer; border: none; }
+.action-btns, .action-btns-bottom { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 6px; }
+.btn { flex: 1; text-align: center; padding: 10px 0; border-radius: 6px; font-size: 0.9rem; font-weight: bold; cursor: pointer; border: none; text-decoration: none; }
 .btn-primary { background: var(--primary-color); color: #ffffff; }
-.btn-primary:hover { background: #1a252f; }
 .btn-img { background: #f39c12; color: #ffffff; }
-.btn-img:hover { background: #d68910; }
 .btn-secondary { background: #e2e8f0; color: #334155; }
-.btn-secondary:hover { background: #cbd5e1; }
 .btn-quote { background: #27ae60; color: #ffffff; }
-.btn-quote:hover { background: #219653; }
 .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.75); justify-content: center; align-items: center; z-index: 1000; }
-.modal-content { background: #fff; padding: 25px; border-radius: 16px; text-align: center; max-width: 360px; width: 90%; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+.modal-content { background: #fff; padding: 25px; border-radius: 16px; text-align: center; width: 90%; max-width: 360px; }
 .loader { text-align: center; padding: 50px; font-size: 1.2rem; color: var(--text-muted); }
 
-/* 浮動購物車按鈕 */
-#cartFab { position: fixed; bottom: 20px; right: 20px; background: var(--primary-color); color: white; padding: 15px 25px; border-radius: 30px; font-weight: bold; box-shadow: 0 4px 15px rgba(0,0,0,0.2); cursor: pointer; z-index: 500; display: flex; align-items: center; gap: 8px; transition: transform 0.2s; }
-#cartFab:active { transform: scale(0.95); }
+#cartFab { position: fixed; bottom: 20px; right: 20px; background: var(--primary-color); color: white; padding: 15px 25px; border-radius: 30px; font-weight: bold; box-shadow: 0 4px 15px rgba(0,0,0,0.2); cursor: pointer; z-index: 500; display: flex; align-items: center; gap: 8px; }
 .cart-badge { background: var(--accent-color); color: white; border-radius: 50%; padding: 2px 8px; font-size: 0.85rem; }
 
-/* 報價單全螢幕 UI */
 #quoteApp { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #f4f6f8; z-index: 2000; overflow-y: auto; flex-direction: column; }
-.quote-toolbar { position: sticky; top: 0; background: #fff; padding: 15px; display: flex; justify-content: space-between; align-items: center; gap: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); z-index: 2001; }
+.quote-toolbar { position: sticky; top: 0; background: #fff; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; gap: 6px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); z-index: 2001; flex-wrap: wrap; }
 .quote-canvas-area { padding: 20px 10px; display: flex; justify-content: center; }
 .quote-paper { background: #fff; width: 100%; max-width: 600px; padding: 25px; border-radius: 8px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); }
-.quote-header-title { text-align: center; font-size: 1.4rem; color: #1a252f; font-weight: 900; margin-bottom: 5px; letter-spacing: 1px; border-bottom: 2px solid #1a252f; padding-bottom: 10px; }
+.quote-header-title { text-align: center; font-size: 1.4rem; color: #1a252f; font-weight: 900; margin-bottom: 5px; border-bottom: 2px solid #1a252f; padding-bottom: 10px; }
 .quote-date { text-align: center; font-size: 0.8rem; color: #7f8c8d; margin-bottom: 20px; }
 .quote-customer-info { display: grid; grid-template-columns: 1fr; gap: 10px; margin-bottom: 20px; }
 .info-group { display: flex; align-items: flex-start; }
-.info-label { width: 50px; font-size: 0.9rem; color: #34495e; font-weight: bold; margin-top: 6px; }
-.info-input { flex: 1; border: none; border-bottom: 1px dashed #bdc3c7; font-size: 1rem; outline: none; background: transparent; color: #2c3e50; font-family: inherit; padding: 6px 4px; }
-.auto-textarea { width: 100%; flex: 1; border: none; border-bottom: 1px dashed #bdc3c7; background: transparent; font-family: inherit; font-size: 0.95rem; color: #2c3e50; padding: 6px 4px; resize: none; overflow: hidden; box-sizing: border-box; }
-.auto-textarea::placeholder { color: #95a5a6; }
+.info-label { width: 60px; font-size: 0.9rem; color: #34495e; font-weight: bold; margin-top: 6px; }
+
+/* 暗黑備註專屬樣式 (拍照時隱藏) */
+#internalInfoGroup { background: #fff3cd; padding: 8px; border-radius: 6px; border-left: 4px solid #f1c40f; margin-bottom: 15px; }
+#internalInfoGroup .info-label { color: #d35400; width: 80px; }
+
+.info-input { flex: 1; border: none; border-bottom: 1px dashed #bdc3c7; font-size: 1rem; outline: none; background: transparent; padding: 6px 4px; border-radius: 0; }
+.auto-textarea { width: 100%; flex: 1; border: none; border-bottom: 1px dashed #bdc3c7; background: transparent; font-family: inherit; font-size: 0.95rem; padding: 6px 4px; resize: none; overflow: hidden; border-radius: 0; }
+.auto-textarea::placeholder, .info-input::placeholder { color: #bdc3c7; }
 
 .quote-items { border-top: 2px solid #ecf0f1; margin-bottom: 15px; }
 .q-item { padding: 15px 0; border-bottom: 1px solid #ecf0f1; position: relative; }
@@ -91,67 +75,61 @@ h1 { font-size: 1.5rem; color: var(--primary-color); margin-bottom: 5px; }
 .q-item-name { font-weight: 900; color: #2c3e50; font-size: 1.05rem; margin-bottom: 5px; padding-right: 25px; }
 .q-item-sku { font-size: 0.8rem; color: #7f8c8d; margin-bottom: 10px; font-family: monospace; }
 .q-item-calc { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
-.q-input-num { width: 50px; border: 1px solid #bdc3c7; border-radius: 4px; text-align: center; flex: none; padding: 4px; }
-.q-input-price { width: 90px; border: 1px solid #bdc3c7; border-radius: 4px; text-align: right; color: var(--accent-color); font-weight: bold; flex: none; padding: 4px; }
+.q-input-num { width: 50px; border: 1px solid #bdc3c7; border-radius: 4px; text-align: center; padding: 4px; }
+.q-input-price { width: 90px; border: 1px solid #bdc3c7; border-radius: 4px; text-align: right; color: var(--accent-color); font-weight: bold; padding: 4px; }
 .q-subtotal { flex: 1; text-align: right; font-weight: bold; color: #2c3e50; font-size: 1.1rem; }
 .quote-summary { background: #f8f9fa; padding: 15px; border-radius: 8px; margin-top: 15px; }
 .summary-row.total { border-top: 1px solid #bdc3c7; padding-top: 10px; margin-top: 10px; display: flex; justify-content: space-between; align-items: center; font-size: 1.3rem; font-weight: 900; color: #e74c3c; }
 
-/* 產生圖片後的浮層 */
 #resultOverlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index: 3000; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
 #resultImg { max-width: 100%; max-height: 80vh; border-radius: 8px; box-shadow: 0 0 20px rgba(255,255,255,0.2); }
 .result-hint { color: #fff; margin-top: 15px; font-size: 1.1rem; font-weight: bold; text-align: center; }
 .close-result { position: absolute; top: 20px; right: 20px; color: #fff; font-size: 2rem; background: none; border: none; cursor: pointer; }
+
+/* 用來替換 input 避免被截斷的純文字標籤 */
+.capture-clone { white-space: pre-wrap; word-break: break-word; color: #2c3e50; }
 </style>
 </head>
 <body>
 <header>
 <h1>家具庫存與報價系統</h1>
-<div class="subtitle">內部專用快速檢索系統 (Google Sheets 實時同步)</div>
+<div class="subtitle">內部專用快速檢索系統</div>
 </header>
 <div class="search-container">
 <input type="text" id="searchInput" class="search-box" placeholder="輸入 SKU 貨號或商品名稱搜尋..." disabled>
 <div class="filter-bar">
-<label class="checkbox-container">
-<input type="checkbox" id="stockFilter">
-⚡ 楊梅有現貨
-</label>
-<label class="checkbox-container">
-<input type="checkbox" id="shopFilter">
-🏪 店內有庫存/展示 (630現貨或展示>0)
-</label>
+<label class="checkbox-container"><input type="checkbox" id="stockFilter">⚡ 楊梅有現貨</label>
+<label class="checkbox-container"><input type="checkbox" id="shopFilter">🏪 630有現貨/展示</label>
 </div>
 <button id="cameraBtn" class="btn btn-secondary" style="width: 100%; margin-top: 15px; margin-bottom: 5px; font-weight: bold; background: #2980b9; color: white; padding: 12px;">📸 喚醒原生相機拍照掃描</button>
 <input type="file" id="qrInput" accept="image/*" capture="environment" style="display: none;">
 <div id="hiddenReader" style="display: none;"></div>
 <div id="scanStatus" style="text-align: center; color: var(--accent-color); font-size: 0.9rem; margin-top: 5px; display: none;">🔍 正在用黑魔法解析照片...</div>
 </div>
-<div class="status-bar">
-<span id="dataCount">載入資料中...</span>
-<span id="lastUpdated">即時連線</span>
-</div>
+<div class="status-bar"><span id="dataCount">載入資料中...</span><span id="lastUpdated">即時連線</span></div>
 <div id="loader" class="loader">正在從 Google 試算表抽取出庫存資料...</div>
 <div id="gridContainer" class="grid-container"></div>
 <div id="qrModal" class="modal" onclick="closeModal()">
 <div class="modal-content" onclick="event.stopPropagation()">
 <h3 id="modalTitle">掃描前往官網</h3>
-<img id="qrImage" src="" alt="QR Code">
+<img id="qrImage" src="" alt="QR Code" style="margin: 15px 0;">
 <button class="btn btn-secondary" style="width: 100%; margin-top: 10px;" onclick="closeModal()">關閉視窗</button>
 </div>
 </div>
 
-<!-- 浮動購物車按鈕 -->
 <div id="cartFab" onclick="toggleQuoteApp()">
     📝 報價單 <span class="cart-badge" id="cartCount">0</span>
 </div>
 
-<!-- 數位報價單 UI -->
 <div id="quoteApp">
     <div class="quote-toolbar">
         <button class="btn btn-secondary" style="flex: 0 0 60px;" onclick="toggleQuoteApp()">返回</button>
-        <button class="btn btn-secondary" style="flex: 0 0 80px; background: #95a5a6; color: white;" onclick="clearQuote()">🗑️ 清空</button>
-        <span style="font-weight: bold; color: #2c3e50; flex: 1; text-align: center; font-size: 0.95rem;">電子報價單</span>
-        <button class="btn btn-primary" style="flex: 0 0 90px; background: #e74c3c;" onclick="generateQuoteImage()">📥 產出</button>
+        <button class="btn btn-secondary" style="flex: 0 0 60px; background: #95a5a6; color: white;" onclick="clearQuote()">清空</button>
+        <!-- 🔥 新增儲存到 CRM 按鈕 -->
+        <button class="btn btn-primary" style="flex: 1; background: #27ae60;" onclick="saveToCRM()" id="btnSaveCRM">💾 存入試算表</button>
+        <!-- 🔥 新增輸出 PDF 按鈕 -->
+        <button class="btn btn-primary" style="flex: 0 0 60px; background: #8e44ad;" onclick="exportPDF()">PDF</button>
+        <button class="btn btn-primary" style="flex: 0 0 60px; background: #e74c3c;" onclick="generateQuoteImage()">圖片</button>
     </div>
     
     <div class="quote-canvas-area">
@@ -160,18 +138,15 @@ h1 { font-size: 1.5rem; color: var(--primary-color); margin-bottom: 5px; }
             <div class="quote-date" id="quoteDateDisplay">列印日期：自動生成</div>
             
             <div class="quote-customer-info">
-                <div class="info-group">
-                    <span class="info-label">姓名</span>
-                    <input type="text" class="info-input" placeholder="請輸入顧客姓名">
+                <!-- 🔥 暗黑備註欄 (截圖與轉 PDF 時會自動隱形) -->
+                <div class="info-group" id="internalInfoGroup">
+                    <span class="info-label">🤫 資訊欄</span>
+                    <textarea id="internalNote" class="auto-textarea" placeholder="輸入顧客特徵或對話重點... (不會出現在報價單上)" rows="1" oninput="autoExpand(this)" style="border-bottom: 1px dashed #d35400;"></textarea>
                 </div>
-                <div class="info-group">
-                    <span class="info-label">電話</span>
-                    <input type="tel" class="info-input" placeholder="請輸入聯絡電話">
-                </div>
-                <div class="info-group">
-                    <span class="info-label">地區</span>
-                    <textarea class="auto-textarea" placeholder="縣市/區域 (例: 台中市南屯區)" rows="1" oninput="autoExpand(this)"></textarea>
-                </div>
+                
+                <div class="info-group"><span class="info-label">姓名</span><input type="text" id="custName" class="info-input" placeholder="請輸入顧客姓名"></div>
+                <div class="info-group"><span class="info-label">電話</span><input type="tel" id="custPhone" class="info-input" placeholder="請輸入聯絡電話"></div>
+                <div class="info-group"><span class="info-label">地區</span><textarea id="custRegion" class="auto-textarea" placeholder="縣市/區域 (例: 台中市南屯區)" rows="1" oninput="autoExpand(this)"></textarea></div>
             </div>
 
             <div class="quote-items" id="quoteItemList"></div>
@@ -203,14 +178,16 @@ h1 { font-size: 1.5rem; color: var(--primary-color); margin-bottom: 5px; }
 
 <script>
 // ==========================================
-// 💡 自動伸縮 Textarea 黑魔法
+// 💡 請將你部署好的 Google Apps Script URL 貼在這裡
 // ==========================================
+const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzcXEH7UQIV09Tk6EuyTHbEPIltdKwa9XkbPr5LzLaysmZUGHYCFDZYTQ7qpcTnQzZe0Q/exec'; 
+const GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTC18jsseZH3TerLqZMzzkJc1uPjh2IVTktcs4DxiuEmpA_NRAnzKrgzZbV43FQtN8b7-vMlvv1BFGF/pub?gid=0&single=true&output=csv';
+
 function autoExpand(field) {
     field.style.height = 'inherit';
     field.style.height = field.scrollHeight + 'px';
 }
 
-const GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTC18jsseZH3TerLqZMzzkJc1uPjh2IVTktcs4DxiuEmpA_NRAnzKrgzZbV43FQtN8b7-vMlvv1BFGF/pub?gid=0&single=true&output=csv';
 let products = [];
 let currentFiltered = [];
 let renderLimit = 100;
@@ -233,8 +210,7 @@ async function fetchProducts() {
         document.getElementById('searchInput').disabled = false;
         filterAndRender();
     } catch (error) {
-        console.error('Fetch error:', error);
-        document.getElementById('loader').innerText = '資料載入失敗，請確認 Google 試算表網址授權與發布設定。';
+        document.getElementById('loader').innerText = '資料載入失敗，請確認網址。';
     }
 }
 
@@ -265,33 +241,6 @@ function parseCSVLine(line) {
     return values.map(v => v.replace(/^["']|["']$/g, ''));
 }
 
-function getActiveShortestPromo(promoPriceStr, promoPeriodStr) {
-    if (!promoPriceStr || !promoPeriodStr) return { price: '', period: '' };
-    const prices = promoPriceStr.split('|').map(s => s.trim());
-    const periods = promoPeriodStr.split('|').map(s => s.trim());
-    if (prices.length !== periods.length || periods.length === 1) {
-        return { price: prices[0] || '', period: periods[0] || '' };
-    }
-    const now = new Date();
-    let bestPromo = null;
-    let minDuration = Infinity;
-    for (let i = 0; i < periods.length; i++) {
-        const parts = periods[i].split('~');
-        if (parts.length === 2) {
-            const start = new Date(parts[0].trim().replace(/\//g, '-') + "T00:00:00");
-            const end = new Date(parts[1].trim().replace(/\//g, '-') + "T23:59:59");
-            if (now >= start && now <= end) {
-                const duration = end - start;
-                if (duration < minDuration) {
-                    minDuration = duration;
-                    bestPromo = { price: prices[i], period: periods[i] };
-                }
-            }
-        }
-    }
-    return bestPromo || { price: '', period: '' };
-}
-
 function filterAndRender() {
     const query = document.getElementById('searchInput').value.toLowerCase().trim();
     const onlyYangmei = document.getElementById('stockFilter').checked;
@@ -308,9 +257,7 @@ function filterAndRender() {
         const matchShop = onlyShop ? (h630Stock > 0 || h630Show > 0) : true;
         return matchText && matchYangmei && matchShop;
     });
-    document.getElementById('dataCount').innerText = query || onlyYangmei || onlyShop
-        ? `過濾結果：${currentFiltered.length} 筆`
-        : `共載入 ${products.length} 筆商品資料`;
+    document.getElementById('dataCount').innerText = query || onlyYangmei || onlyShop ? `過濾結果：${currentFiltered.length} 筆` : `共載入 ${products.length} 筆商品`;
     renderLimit = 100;
     renderProducts();
 }
@@ -320,7 +267,7 @@ function renderProducts() {
     container.innerHTML = '';
     const listToRender = currentFiltered.slice(0, renderLimit);
     if (listToRender.length === 0) {
-        container.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #888; font-size: 1.2rem;">查無符合條件的商品，要不要叫客人直接買樣品走？</div>';
+        container.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #888;">查無商品</div>';
         return;
     }
     listToRender.forEach(p => {
@@ -331,124 +278,66 @@ function renderProducts() {
         const h630Stock = parseInt(getVal('HOLA630庫存') || '0');
         const h630Show = parseInt(getVal('HOLA630展示') || '0');
         const origPrice = getVal('一般售價') || '0';
-        let rawPromoPrice = getVal('促銷售價');
-        if(rawPromoPrice === '#N/A' || rawPromoPrice === '0') rawPromoPrice = '';
-        let rawPromoPeriod = getVal('促銷期間');
-        if(rawPromoPeriod === '#N/A') rawPromoPeriod = '';
-        const activePromo = getActiveShortestPromo(rawPromoPrice, rawPromoPeriod);
-        const promoPrice = activePromo.price;
-        const promoPeriod = activePromo.period;
-        const category = getVal('商品分類') || '無分類';
-        const vendor = getVal('廠商') || '';
-
-        const statusRaw = getVal('商品狀態') || '';
-        let statusHtml = '';
-        if (statusRaw.toUpperCase() === 'D') {
-            statusHtml = `<span style="color: #c0392b; font-weight: bold; background: #fadbd8; padding: 2px 6px; border-radius: 4px;">⚠️ 不續訂商品 (D)</span>`;
-        } else if (statusRaw.toUpperCase() === 'A') {
-            statusHtml = `<span style="color: #27ae60; font-weight: bold; background: #d5f5e3; padding: 2px 6px; border-radius: 4px;">✅ 正常品 (A)</span>`;
-        } else if (statusRaw !== '') {
-            statusHtml = `<span style="color: var(--text-muted);">${statusRaw}</span>`;
-        }
-
-        const hasPhoto = Object.values(p).some(val => typeof val === 'string' && val.includes('有照片'));
-        const photoBtnHtml = hasPhoto
-            ? `<a href="https://satanhotdog.github.io/hola-furniture-search/?q=${sku}" target="_blank" class="btn btn-img">圖片</a>`
-            : `<button class="btn btn-secondary" style="opacity: 0.6; cursor: not-allowed; background: #e0e0e0; color: #999;" disabled>💀 缺照片</button>`;
-
-        const bestPriceForQuote = promoPrice ? promoPrice.replace(/,/g, '') : origPrice.replace(/,/g, '');
+        let promoPrice = getVal('促銷售價') || '';
+        if(promoPrice === '#N/A' || promoPrice === '0') promoPrice = '';
+        
+        const bestPrice = promoPrice ? promoPrice.replace(/,/g, '') : origPrice.replace(/,/g, '');
 
         const card = document.createElement('div');
         card.className = 'card';
         card.innerHTML = `
         <div>
-        <div class="card-header">
-        <span class="sku-tag">SKU: ${sku}</span>
-        <div class="item-name">${name}</div>
-        </div>
+        <div class="card-header"><span class="sku-tag">SKU: ${sku}</span><div class="item-name">${name}</div></div>
         <div class="stock-section">
-        <div class="stock-box"><span class="stock-title">楊梅庫存</span><span class="stock-val ${ymStock > 0 ? 'has-stock' : ''}">${ymStock}</span></div>
-        <div class="stock-box"><span class="stock-title">HOLA630</span><span class="stock-val ${h630Stock > 0 ? 'has-stock' : ''}">${h630Stock}</span></div>
-        <div class="stock-box"><span class="stock-title">630展示</span><span class="stock-val ${h630Show > 0 ? 'has-stock' : ''}">${h630Show}</span></div>
+        <div class="stock-box"><span class="stock-title">楊梅</span><span class="stock-val ${ymStock > 0 ? 'has-stock' : ''}">${ymStock}</span></div>
+        <div class="stock-box"><span class="stock-title">HOLA</span><span class="stock-val ${h630Stock > 0 ? 'has-stock' : ''}">${h630Stock}</span></div>
+        <div class="stock-box"><span class="stock-title">展示</span><span class="stock-val ${h630Show > 0 ? 'has-stock' : ''}">${h630Show}</span></div>
         </div>
         <div class="price-section">
         <div class="price-row"><span class="price-label">一般售價</span><span class="${promoPrice ? 'price-orig' : 'price-promo'}">$${origPrice}</span></div>
         ${promoPrice ? `<div class="price-row"><span class="price-label">現在特價</span><span class="price-promo">$${promoPrice}</span></div>` : ''}
-        ${promoPeriod ? `<div class="promo-period">⏱️ 最終檔期: ${promoPeriod}</div>` : ''}
         </div>
-        <div class="info-row">
-        <span>分類: ${category}</span>
-        ${vendor ? `<span>廠商: ${vendor}</span>` : ''}
         </div>
-        ${statusHtml ? `<div class="info-row" style="margin-top: -8px;"><span>狀態: ${statusHtml}</span></div>` : ''}
-        </div>
-        
         <div>
-            <div class="action-btns">
-                <a href="https://www.hola.com.tw/p/${sku}" target="_blank" class="btn btn-primary">官網</a>
-                ${photoBtnHtml}
-            </div>
-            <div class="action-btns-bottom">
+            <div class="action-btns-bottom" style="margin-top:10px;">
                 <button class="btn btn-secondary" onclick="showQR('${sku}')">QR Code</button>
-                <button class="btn btn-quote" onclick="addToQuote('${sku}', '${name.replace(/'/g, "\\'")}', ${bestPriceForQuote || 0})">➕ 報價</button>
+                <button class="btn btn-quote" onclick="addToQuote('${sku}', '${name.replace(/'/g, "\\'")}', ${bestPrice || 0})">➕ 報價</button>
             </div>
         </div>
         `;
         container.appendChild(card);
     });
-    if (renderLimit < currentFiltered.length) {
-        const btnDiv = document.createElement('div');
-        btnDiv.style = "grid-column: 1/-1; text-align: center; padding: 10px;";
-        const remaining = currentFiltered.length - renderLimit;
-        btnDiv.innerHTML = `<button class="btn btn-secondary" style="width: 100%; padding: 15px; font-weight: bold; font-size: 1.1rem; border: 2px dashed #95a5a6; background: #eef2f7;" onclick="loadMore()">⬇️ 還有 ${remaining} 筆沒顯示，點我繼續往下挖</button>`;
-        container.appendChild(btnDiv);
-    }
 }
-
-function loadMore() { renderLimit += 100; renderProducts(); }
 document.getElementById('searchInput').addEventListener('input', filterAndRender);
 document.getElementById('stockFilter').addEventListener('change', filterAndRender);
 document.getElementById('shopFilter').addEventListener('change', filterAndRender);
-function showQR(sku) {
-    document.getElementById('modalTitle').innerText = `${sku}`;
-    document.getElementById('qrImage').src = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https://www.hola.com.tw/p/${sku}`;
-    document.getElementById('qrModal').style.display = 'flex';
-}
+function showQR(sku) { document.getElementById('modalTitle').innerText = `${sku}`; document.getElementById('qrImage').src = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https://www.hola.com.tw/p/${sku}`; document.getElementById('qrModal').style.display = 'flex'; }
 function closeModal() { document.getElementById('qrModal').style.display = 'none'; }
 fetchProducts();
 
 // ==========================================
-// 🚀 報價單黑魔法區塊
+// 🚀 報價單與 CRM 引擎
 // ==========================================
 
 function addToQuote(sku, name, price) {
-    const existItem = quoteCart.find(i => i.sku === sku);
-    if (existItem) {
-        existItem.qty += 1;
-    } else {
-        quoteCart.push({ id: Date.now(), sku: sku, name: name, price: parseInt(price), qty: 1, note: '' });
-    }
-    updateCartCount();
+    const exist = quoteCart.find(i => i.sku === sku);
+    if (exist) exist.qty += 1;
+    else quoteCart.push({ id: Date.now(), sku, name, price: parseInt(price), qty: 1, note: '' });
+    document.getElementById('cartCount').innerText = quoteCart.reduce((s, i) => s + i.qty, 0);
     
     const toast = document.createElement('div');
     toast.innerText = "✅ 已加入報價單";
-    toast.style = "position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:rgba(0,0,0,0.8); color:white; padding:15px 30px; border-radius:30px; z-index:9999; font-weight:bold; font-size:1.1rem; transition:opacity 0.5s;";
+    toast.style = "position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:rgba(0,0,0,0.8); color:white; padding:15px 30px; border-radius:30px; z-index:9999; font-weight:bold;";
     document.body.appendChild(toast);
-    setTimeout(() => { toast.style.opacity = '0'; setTimeout(()=>toast.remove(), 500); }, 1500);
-}
-
-function updateCartCount() {
-    const totalItems = quoteCart.reduce((sum, item) => sum + item.qty, 0);
-    document.getElementById('cartCount').innerText = totalItems;
+    setTimeout(() => { toast.style.opacity = '0'; setTimeout(()=>toast.remove(), 500); }, 1000);
 }
 
 function toggleQuoteApp() {
     const app = document.getElementById('quoteApp');
-    if (app.style.display === 'flex') {
-        app.style.display = 'none';
-    } else {
-        const today = new Date();
-        document.getElementById('quoteDateDisplay').innerText = `結帳報價日期：${today.getFullYear()}/${(today.getMonth()+1).toString().padStart(2,'0')}/${today.getDate().toString().padStart(2,'0')}`;
+    if (app.style.display === 'flex') app.style.display = 'none';
+    else {
+        const d = new Date();
+        document.getElementById('quoteDateDisplay').innerText = `結帳報價日期：${d.getFullYear()}/${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}`;
         renderQuoteItems();
         app.style.display = 'flex';
     }
@@ -457,153 +346,156 @@ function toggleQuoteApp() {
 function clearQuote() {
     if(confirm("確定要清空整張報價單嗎？")) {
         quoteCart = [];
-        document.querySelectorAll('.info-input, .auto-textarea').forEach(input => {
-            input.value = '';
-            autoExpand(input);
-        });
+        document.querySelectorAll('.info-input, .auto-textarea').forEach(input => { input.value = ''; autoExpand(input); });
         document.getElementById('extraFeeInput').value = '0';
         renderQuoteItems();
-        updateCartCount();
+        document.getElementById('cartCount').innerText = '0';
     }
 }
 
 function renderQuoteItems() {
     const list = document.getElementById('quoteItemList');
     list.innerHTML = '';
-    
     if (quoteCart.length === 0) {
         list.innerHTML = '<div style="padding: 30px; text-align: center; color: #95a5a6;">購物車空空如也，趕快去賣場洗客人的腦！</div>';
-        calculateQuoteTotal();
-        return;
+        calculateQuoteTotal(); return;
     }
-
     quoteCart.forEach((item, index) => {
-        const subtotal = item.price * item.qty;
+        const sub = item.price * item.qty;
         const div = document.createElement('div');
         div.className = 'q-item';
         div.innerHTML = `
-            <button class="q-item-del" onclick="removeFromQuote(${index})" title="刪除">✖</button>
+            <button class="q-item-del" onclick="quoteCart.splice(${index},1); renderQuoteItems(); document.getElementById('cartCount').innerText = quoteCart.reduce((s, i) => s + i.qty, 0);" title="刪除">✖</button>
             <div class="q-item-name">${item.name}</div>
             <div class="q-item-sku">SKU: ${item.sku}</div>
-            
             <div class="q-item-calc">
-                <input type="number" class="q-input-num" value="${item.qty}" min="1" onchange="updateQuoteItem(${index}, 'qty', this.value)">
-                <span style="color:#7f8c8d; font-weight:bold;">X</span>
-                <input type="number" class="q-input-price" value="${item.price}" onchange="updateQuoteItem(${index}, 'price', this.value)">
-                <span style="color:#7f8c8d; font-weight:bold;">=</span>
-                <span class="q-subtotal">$${subtotal.toLocaleString()}</span>
+                <input type="number" class="q-input-num" value="${item.qty}" min="1" onchange="quoteCart[${index}].qty=parseInt(this.value)||1; renderQuoteItems();"> X
+                <input type="number" class="q-input-price" value="${item.price}" onchange="quoteCart[${index}].price=parseInt(this.value)||0; renderQuoteItems();"> =
+                <span class="q-subtotal">$${sub.toLocaleString()}</span>
             </div>
-            
-            <textarea class="auto-textarea" placeholder="備註 (例: 楊梅剩2組 / 指定灰色 / 特規訂製)" rows="1" oninput="autoExpand(this)" onchange="updateQuoteItem(${index}, 'note', this.value)">${item.note}</textarea>
+            <textarea class="auto-textarea" placeholder="商品備註" rows="1" oninput="autoExpand(this)" onchange="quoteCart[${index}].note=this.value">${item.note}</textarea>
         `;
         list.appendChild(div);
     });
-    
-    setTimeout(() => {
-        document.querySelectorAll('.auto-textarea').forEach(el => autoExpand(el));
-    }, 10);
-    
+    setTimeout(() => document.querySelectorAll('.auto-textarea').forEach(el => autoExpand(el)), 10);
     calculateQuoteTotal();
 }
 
-function updateQuoteItem(index, field, value) {
-    if (field === 'qty') quoteCart[index].qty = parseInt(value) || 1;
-    if (field === 'price') quoteCart[index].price = parseInt(value) || 0;
-    if (field === 'note') quoteCart[index].note = value;
-    renderQuoteItems();
-    updateCartCount();
-}
-
-function removeFromQuote(index) {
-    quoteCart.splice(index, 1);
-    renderQuoteItems();
-    updateCartCount();
-}
-
 function calculateQuoteTotal() {
-    const itemsTotal = quoteCart.reduce((sum, item) => sum + (item.price * item.qty), 0);
-    const extraFee = parseInt(document.getElementById('extraFeeInput').value) || 0;
-    const grandTotal = itemsTotal + extraFee;
-    document.getElementById('quoteGrandTotal').innerText = `$${grandTotal.toLocaleString()}`;
+    const total = quoteCart.reduce((s, i) => s + (i.price * i.qty), 0) + (parseInt(document.getElementById('extraFeeInput').value) || 0);
+    document.getElementById('quoteGrandTotal').innerText = `$${total.toLocaleString()}`;
 }
 
-// 🔥 把 HTML 轉換成圖片的黑魔法 (完美隱藏提示字元)
-function generateQuoteImage() {
-    document.activeElement.blur(); 
+// 🔥 傳送到 Google 試算表 CRM
+function saveToCRM() {
+    if(quoteCart.length === 0) return alert("報價單沒東西怎麼存？");
+    if(GAS_WEB_APP_URL === 'YOUR_WEB_APP_URL_HERE') return alert("請先填入你的 GAS Web App URL！");
     
-    const inputs = document.querySelectorAll('#quotePaper input, #quotePaper textarea');
-    inputs.forEach(input => {
-        input.setAttribute('value', input.value); 
-        if(!input.value) {
-            input.dataset.ph = input.placeholder;
-            input.placeholder = ''; 
-        }
-    });
+    const btn = document.getElementById('btnSaveCRM');
+    btn.innerText = "傳送中..."; btn.disabled = true;
 
-    document.querySelectorAll('.q-item-del').forEach(el => el.style.display = 'none');
-    
-    const paper = document.getElementById('quotePaper');
-    
-    html2canvas(paper, {
-        scale: 2, 
-        backgroundColor: "#ffffff",
-        logging: false
-    }).then(canvas => {
-        document.querySelectorAll('.q-item-del').forEach(el => el.style.display = 'block');
-        inputs.forEach(input => {
-            if(input.dataset.ph) {
-                input.placeholder = input.dataset.ph;
-                input.removeAttribute('data-ph');
-            }
-        });
-        
-        const imgData = canvas.toDataURL("image/jpeg", 0.9);
-        document.getElementById('resultImg').src = imgData;
-        document.getElementById('resultOverlay').style.display = 'flex';
-    }).catch(err => {
-        alert("截圖失敗！這台破手機可能記憶體不夠了：" + err);
-        document.querySelectorAll('.q-item-del').forEach(el => el.style.display = 'block');
-    });
-}
+    const payload = {
+        timestamp: new Date().toLocaleString('zh-TW', {hour12: false}),
+        info: document.getElementById('internalNote').value,
+        name: document.getElementById('custName').value,
+        phone: document.getElementById('custPhone').value,
+        region: document.getElementById('custRegion').value,
+        extraFee: document.getElementById('extraFeeInput').value,
+        extraFeeNote: document.getElementById('extraFeeNote').value,
+        items: quoteCart.map(i => ({
+            itemDetail: `${i.name} (SKU:${i.sku}) - ${i.qty}件 x $${i.price}`,
+            note: i.note
+        }))
+    };
 
-// ==========================================
-// 📸 原生相機 QR Code 掃描解析引擎
-// ==========================================
-const html5QrCode = new Html5Qrcode("hiddenReader");
-document.getElementById('cameraBtn').addEventListener('click', () => {
-    document.getElementById('qrInput').click(); 
-});
-document.getElementById('qrInput').addEventListener('change', event => {
-    if (event.target.files.length == 0) return;
-    const file = event.target.files[0];
-    const statusDiv = document.getElementById('scanStatus');
-    statusDiv.style.display = 'block';
-    
-    html5QrCode.scanFile(file, true).then(decodedText => {
-        statusDiv.style.display = 'none';
-        let targetSku = null;
-        const pMatch = decodedText.match(/\/p\/(0\d{8})/i);
-        const rMatch = decodedText.match(/RPage=.*?(0\d{8})(?=\D|$)/i);
-        const blindMatch = decodedText.match(/(0\d{8})(?=\D|$)/);
-        
-        if (pMatch && pMatch[1]) targetSku = pMatch[1];
-        else if (rMatch && rMatch[1]) targetSku = rMatch[1];
-        else if (blindMatch && blindMatch[1]) targetSku = blindMatch[1];
-        
-        if (targetSku) {
-            let searchBox = document.getElementById('searchInput');
-            searchBox.value = targetSku;
-            searchBox.dispatchEvent(new Event('input'));
+    fetch(GAS_WEB_APP_URL, {
+        method: 'POST',
+        body: JSON.stringify(payload)
+    }).then(res => res.json()).then(data => {
+        if(data.status === 'success') {
+            alert('✅ 報價單已成功存入你的私刑試算表！');
         } else {
-            alert("掃描成功，但這不是 SKU！\n系統抓到的妖孽是：" + decodedText + "\n\n(可能是拍到旁邊的廠商出貨條碼，請針對網址 QR Code 重新拍一次)");
+            alert('❌ 寫入失敗：' + data.message);
         }
     }).catch(err => {
-        statusDiv.style.display = 'none';
-        alert("解析失敗！照片可能太糊、反光，或是根本沒拍到 QR Code。請重新對焦再拍一次。");
-    }).finally(() => { 
-        event.target.value = ''; 
+        alert('❌ 網路錯誤或跨網域被阻擋');
+    }).finally(() => {
+        btn.innerText = "💾 存入試算表"; btn.disabled = false;
     });
-});
+}
+
+// ==========================================
+// 🔥 解決文字腰斬的「DOM 抽換黑魔法」
+// ==========================================
+function prepareForCapture() {
+    document.activeElement.blur();
+    document.getElementById('internalInfoGroup').style.display = 'none'; // 隱藏暗黑備註
+    document.querySelectorAll('.q-item-del').forEach(el => el.style.display = 'none'); // 隱藏刪除按鈕
+
+    // 關鍵！把所有 input / textarea 抽換成 div，徹底消滅行高渲染 BUG
+    document.querySelectorAll('#quotePaper input, #quotePaper textarea').forEach(el => {
+        const div = document.createElement('div');
+        div.className = 'capture-clone ' + el.className;
+        
+        // 複製樣式並確保文字換行
+        div.style.cssText = window.getComputedStyle(el).cssText;
+        div.style.padding = '6px 4px';
+        div.style.borderBottom = el.style.borderBottom;
+        div.style.whiteSpace = 'pre-wrap';
+        div.style.wordBreak = 'break-word';
+        div.style.minHeight = el.offsetHeight + 'px';
+        
+        // 處理空值的佔位符號
+        if(!el.value && el.placeholder) {
+            div.innerText = ''; 
+        } else {
+            div.innerText = el.value;
+        }
+
+        el.style.display = 'none';
+        el.parentNode.insertBefore(div, el);
+    });
+}
+
+function restoreAfterCapture() {
+    document.getElementById('internalInfoGroup').style.display = 'flex';
+    document.querySelectorAll('.q-item-del').forEach(el => el.style.display = 'block');
+    document.querySelectorAll('.capture-clone').forEach(el => el.remove());
+    document.querySelectorAll('#quotePaper input, #quotePaper textarea').forEach(el => {
+        el.style.display = '';
+    });
+}
+
+// 產出圖片
+function generateQuoteImage() {
+    prepareForCapture();
+    html2canvas(document.getElementById('quotePaper'), { scale: 2, backgroundColor: "#ffffff" }).then(canvas => {
+        restoreAfterCapture();
+        document.getElementById('resultImg').src = canvas.toDataURL("image/jpeg", 0.9);
+        document.getElementById('resultOverlay').style.display = 'flex';
+    });
+}
+
+// 產出律師函等級 PDF
+function exportPDF() {
+    prepareForCapture();
+    html2canvas(document.getElementById('quotePaper'), { scale: 2, backgroundColor: "#ffffff" }).then(canvas => {
+        restoreAfterCapture();
+        
+        const imgData = canvas.toDataURL("image/jpeg", 1.0);
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const imgProps = pdf.getImageProperties(imgData);
+        const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+        
+        pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
+        
+        let cName = document.getElementById('custName').value || '貴賓';
+        pdf.save(`HOLA大墩店報價單_${cName}.pdf`);
+    });
+}
 </script>
 </body>
 </html>
