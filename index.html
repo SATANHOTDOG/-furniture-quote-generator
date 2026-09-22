@@ -80,7 +80,7 @@ h1 { font-size: 1.5rem; color: var(--primary-color); margin-bottom: 5px; }
 .q-input-price { width: 90px; border: 1px solid #bdc3c7; border-radius: 4px; text-align: right; color: var(--accent-color); font-weight: bold; padding: 4px; }
 .q-subtotal { flex: 1; text-align: right; font-weight: bold; color: #2c3e50; font-size: 1.1rem; }
 
-/* 🔥 圖片區塊專用 CSS */
+/* 圖片區塊專用 CSS */
 .q-item-images-container { display: flex; gap: 10px; margin-top: 10px; flex-wrap: nowrap; }
 .q-item-image-wrapper { flex: 1; position: relative; max-width: calc(50% - 5px); border-radius: 8px; overflow: hidden; display: none; background: #f8f9fa; border: 1px solid #e9ecef; }
 .q-item-image-wrapper img { width: 100%; height: auto; display: block; object-fit: contain; }
@@ -90,6 +90,9 @@ h1 { font-size: 1.5rem; color: var(--primary-color); margin-bottom: 5px; }
 
 .quote-summary { background: #f8f9fa; padding: 15px; border-radius: 8px; margin-top: 15px; }
 .summary-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 10px; }
+
+/* 🔥 幽靈折扣區塊 CSS */
+.discount-section { border-top: 1px dashed #bdc3c7; padding-top: 10px; margin-top: 10px; }
 
 .summary-row.total { border-top: 1px solid #bdc3c7; padding-top: 15px; margin-top: 15px; display: flex; justify-content: space-between; align-items: baseline; font-size: 1.3rem; font-weight: 900; color: #e74c3c; }
 .total-warning { font-size: 0.75rem; color: #e74c3c; font-weight: normal; margin-top: 5px; text-align: right; width: 100%; display: block; }
@@ -170,6 +173,15 @@ h1 { font-size: 1.5rem; color: var(--primary-color); margin-bottom: 5px; }
                     <textarea id="extraFeeNote" class="auto-textarea" placeholder="在此填寫費用明細 (例: 未達2萬基本運費 $1,500、無電梯登高費 $300)" rows="1" oninput="autoExpand(this)"></textarea>
                 </div>
                 
+                <!-- 🔥 新增：幽靈折扣區塊 -->
+                <div id="discountBlock" class="discount-section">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <span style="color: #16a085; font-weight: bold; font-size: 0.95rem;">預計折扣金額</span>
+                        <input type="number" id="discountInput" class="q-input-price" style="color: #16a085; border-color: #16a085;" value="0" oninput="calculateQuoteTotal()">
+                    </div>
+                    <textarea id="discountNote" class="auto-textarea" placeholder="在此填寫折扣備註 (例: 滿8萬打85折)" rows="1" oninput="autoExpand(this)" style="color: #16a085;"></textarea>
+                </div>
+                
                 <div class="summary-row total">
                     <span>商品總金額</span>
                     <span id="quoteGrandTotal">$0</span>
@@ -203,7 +215,7 @@ h1 { font-size: 1.5rem; color: var(--primary-color); margin-bottom: 5px; }
 
 <script>
 // ==========================================
-// 💡 請將你部署好的 Google Apps Script URL 貼在這裡
+// 💡 你專屬的 GAS 網址已就位
 // ==========================================
 const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxrhh56MPO5Kw1kC3Ji66y3181amvj22KFRFhpz7lBDxKnZl0myQcuZxw0jzsPckIdILg/exec'; 
 const GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTC18jsseZH3TerLqZMzzkJc1uPjh2IVTktcs4DxiuEmpA_NRAnzKrgzZbV43FQtN8b7-vMlvv1BFGF/pub?gid=0&single=true&output=csv';
@@ -431,7 +443,6 @@ function addToQuote(sku, name, price) {
     if (exist) {
         exist.qty += 1;
     } else {
-        // 新增 images 陣列來存放這項商品的本機壓縮圖片
         quoteCart.push({ id: Date.now(), sku, name, price: parseInt(price), qty: 1, note: '', images: [] });
     }
     document.getElementById('cartCount').innerText = quoteCart.reduce((s, i) => s + i.qty, 0);
@@ -460,6 +471,7 @@ function clearQuote() {
         quoteCart = [];
         document.querySelectorAll('.info-input, #quotePaper .auto-textarea:not(#promoNote)').forEach(input => { input.value = ''; autoExpand(input); });
         document.getElementById('extraFeeInput').value = '0';
+        document.getElementById('discountInput').value = '0'; // 清除折扣
         renderQuoteItems();
         document.getElementById('cartCount').innerText = '0';
     }
@@ -475,7 +487,6 @@ function renderQuoteItems() {
     quoteCart.forEach((item, index) => {
         const sub = item.price * item.qty;
         
-        // 生成圖片區塊 HTML
         let imagesHtml = '';
         if (item.images && item.images.length > 0) {
             item.images.forEach((imgData, imgIdx) => {
@@ -516,12 +527,10 @@ function renderQuoteItems() {
     calculateQuoteTotal();
 }
 
-// 🔥 微型畫布壓縮引擎：處理圖片上傳並壓縮，防止記憶體爆掉
 function handleQuoteImageUpload(event, itemIndex) {
     const file = event.target.files[0];
     if (!file) return;
     
-    // 檢查目前該商品圖片數量
     if (!quoteCart[itemIndex].images) quoteCart[itemIndex].images = [];
     if (quoteCart[itemIndex].images.length >= 2) {
         alert("這項商品已經有2張圖片了！");
@@ -532,7 +541,6 @@ function handleQuoteImageUpload(event, itemIndex) {
     reader.onload = function(e) {
         const img = new Image();
         img.onload = function() {
-            // 設定最大寬度，強制壓縮
             const MAX_WIDTH = 800;
             let width = img.width;
             let height = img.height;
@@ -548,17 +556,15 @@ function handleQuoteImageUpload(event, itemIndex) {
             const ctx = canvas.getContext('2d');
             ctx.drawImage(img, 0, 0, width, height);
             
-            // 轉成 Base64 字串，品質設定為 0.7 (夠清晰且檔案小)
             const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.7);
             
-            // 存入購物車陣列
             quoteCart[itemIndex].images.push(compressedDataUrl);
-            renderQuoteItems(); // 重新渲染報價單畫面
+            renderQuoteItems(); 
         };
         img.src = e.target.result;
     };
     reader.readAsDataURL(file);
-    event.target.value = ''; // 清空 input 讓下次可以選同一張圖
+    event.target.value = ''; 
 }
 
 function removeQuoteImage(itemIndex, imgIndex) {
@@ -568,19 +574,24 @@ function removeQuoteImage(itemIndex, imgIndex) {
     }
 }
 
+// 🔥 計算邏輯：加入預計折扣金額扣除
 function calculateQuoteTotal() {
     const itemsTotal = quoteCart.reduce((sum, item) => sum + (item.price * item.qty), 0);
-    document.getElementById('quoteGrandTotal').innerText = `$${itemsTotal.toLocaleString()}`;
+    const discountVal = parseInt(document.getElementById('discountInput').value) || 0;
+    
+    // 總金額 = 商品總金額 - 折扣金額 (避免變負數)
+    const finalTotal = Math.max(0, itemsTotal - discountVal);
+    
+    document.getElementById('quoteGrandTotal').innerText = `$${finalTotal.toLocaleString()}`;
 }
 
 function saveToCRM() {
     if(quoteCart.length === 0) return alert("報價單沒東西怎麼存？");
-    if(!GAS_WEB_APP_URL || GAS_WEB_APP_URL.includes('YOUR_WEB_APP_URL_HERE')) return alert("請先填入你的 GAS Web App URL！");
     
     const btn = document.getElementById('btnSaveCRM');
     btn.innerText = "傳送中..."; btn.disabled = true;
 
-    // 🔥 絕不傳送圖片資料，保護試算表空間與連線速度
+    // 🔥 存檔資料保持乾淨，不包含折扣資訊與圖片
     const payload = {
         timestamp: new Date().toLocaleString('zh-TW', {hour12: false}),
         info: document.getElementById('internalNote').value,
@@ -613,16 +624,34 @@ function saveToCRM() {
 }
 
 // ==========================================
-// 🔥 終極版 DOM 抽換 + 防止滾動條截斷黑魔法 + 圖片隱身術
+// 🔥 終極版 DOM 抽換 + 圖片/折扣隱身術
 // ==========================================
 function prepareForCapture() {
     document.activeElement.blur();
     document.getElementById('internalInfoGroup').style.display = 'none'; 
     
-    // 隱藏所有帶有 capture-hide class 的元素 (包含刪除商品按鈕、刪除圖片按鈕、新增圖片按鈕)
+    // 隱藏輔助按鈕
     document.querySelectorAll('.capture-hide').forEach(el => el.style.display = 'none'); 
 
+    // 🔥 幽靈折扣模組：判斷是否隱藏整個區塊
+    const discountInput = document.getElementById('discountInput');
+    const discountNote = document.getElementById('discountNote');
+    const discountBlock = document.getElementById('discountBlock');
+    
+    const discountVal = parseInt(discountInput.value) || 0;
+    const discountText = discountNote.value.trim();
+    
+    if (discountVal === 0 && discountText === '') {
+        // 金額為0且備註為空，直接讓這區塊人間蒸發
+        discountBlock.style.display = 'none';
+        discountBlock.classList.add('was-hidden-by-capture'); // 標記起來，還原時才知道要救它
+    }
+
+    // 處理輸入框轉純文字
     document.querySelectorAll('#quotePaper input, #quotePaper textarea').forEach(el => {
+        // 如果是剛才被隱藏的區塊內的元素，就跳過不處理 clone
+        if (el.closest('.was-hidden-by-capture')) return;
+
         const div = document.createElement('div');
         div.className = 'capture-clone';
         
@@ -630,12 +659,17 @@ function prepareForCapture() {
             div.className += ' capture-clone-inline';
             div.style.textAlign = el.style.textAlign || 'center';
             div.style.fontWeight = 'bold';
-            div.style.color = el.classList.contains('q-input-price') ? '#e74c3c' : '#2c3e50';
+            // 折扣金額保持綠色，其他金額保持紅色/深色
+            div.style.color = el.id === 'discountInput' ? '#16a085' : (el.classList.contains('q-input-price') ? '#e74c3c' : '#2c3e50');
         } else if (el.id === 'promoNote') {
             div.style.color = '#2c3e50';
             div.style.fontSize = '0.85rem';
             div.style.lineHeight = '1.5';
             div.style.fontWeight = 'bold';
+        } else if (el.id === 'discountNote') {
+            div.style.color = '#16a085';
+            div.style.fontSize = '0.95rem';
+            div.style.padding = '6px 4px';
         } else {
             div.style.padding = '6px 4px';
             div.style.borderBottom = '1px dashed #bdc3c7';
@@ -653,8 +687,14 @@ function prepareForCapture() {
 function restoreAfterCapture() {
     document.getElementById('internalInfoGroup').style.display = 'flex';
     
-    // 復原被隱藏的按鈕 (依照他們原本應該出現的邏輯恢復，這裡簡單處理全部 block，如果是 display:flex 或其他，在 renderQuoteItems 會自動重置)
-    renderQuoteItems(); // 最保險的做法是重新渲染一次購物車列表
+    // 復原幽靈折扣區塊
+    const discountBlock = document.getElementById('discountBlock');
+    if (discountBlock.classList.contains('was-hidden-by-capture')) {
+        discountBlock.style.display = 'block'; // 恢復顯示
+        discountBlock.classList.remove('was-hidden-by-capture');
+    }
+    
+    renderQuoteItems(); 
     
     document.querySelectorAll('.capture-clone').forEach(el => el.remove());
     document.querySelectorAll('#quotePaper input, #quotePaper textarea').forEach(el => { el.style.display = ''; });
@@ -666,7 +706,6 @@ function generateQuoteImage() {
     const originalScroll = app.scrollTop;
     app.style.overflow = 'visible';
 
-    // 加入 useCORS: true 確保圖片能正確截取
     html2canvas(document.getElementById('quotePaper'), { 
         scale: 2, 
         backgroundColor: "#ffffff",
