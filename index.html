@@ -55,7 +55,6 @@ h1 { font-size: 1.5rem; color: var(--primary-color); margin-bottom: 5px; }
 #quoteApp { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #f4f6f8; z-index: 2000; overflow-y: auto; flex-direction: column; }
 .quote-toolbar { position: sticky; top: 0; background: #fff; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; gap: 6px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); z-index: 2001; flex-wrap: wrap; }
 
-/* 🔥 主管模式開關 CSS */
 .btn-boss-mode { flex: 0 0 auto; background: #e2e8f0; color: #94a3b8; font-size: 0.8rem; padding: 8px; border-radius: 6px; transition: all 0.3s; }
 .btn-boss-mode.active { background: #e74c3c; color: white; font-weight: bold; box-shadow: 0 0 8px rgba(231,76,60,0.5); }
 
@@ -85,7 +84,6 @@ h1 { font-size: 1.5rem; color: var(--primary-color); margin-bottom: 5px; }
 .q-input-price { width: 90px; border: 1px solid #bdc3c7; border-radius: 4px; text-align: right; color: var(--accent-color); font-weight: bold; padding: 4px; }
 .q-subtotal { flex: 1; text-align: right; font-weight: bold; color: #2c3e50; font-size: 1.1rem; }
 
-/* 圖片區塊專用 CSS */
 .q-item-images-container { display: flex; gap: 10px; margin-top: 10px; flex-wrap: nowrap; }
 .q-item-image-wrapper { flex: 1; position: relative; max-width: calc(50% - 5px); border-radius: 8px; overflow: hidden; display: none; background: #f8f9fa; border: 1px solid #e9ecef; }
 .q-item-image-wrapper img { width: 100%; height: auto; display: block; object-fit: contain; }
@@ -96,7 +94,6 @@ h1 { font-size: 1.5rem; color: var(--primary-color); margin-bottom: 5px; }
 .quote-summary { background: #f8f9fa; padding: 15px; border-radius: 8px; margin-top: 15px; }
 .summary-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 10px; }
 
-/* 幽靈折扣區塊 CSS */
 .discount-section { border-top: 1px dashed #bdc3c7; padding-top: 10px; margin-top: 10px; }
 
 .summary-row.total { border-top: 1px solid #bdc3c7; padding-top: 15px; margin-top: 15px; display: flex; justify-content: space-between; align-items: baseline; font-size: 1.3rem; font-weight: 900; color: #e74c3c; }
@@ -160,7 +157,6 @@ h1 { font-size: 1.5rem; color: var(--primary-color); margin-bottom: 5px; }
             <div class="quote-customer-info">
                 <div class="info-group" id="internalInfoGroup">
                     <span class="info-label">🤫 資訊欄</span>
-                    <!-- 🔥 支援 **紅色粗體** 黑魔法 -->
                     <textarea id="internalNote" class="auto-textarea" placeholder="輸入顧客特徵... 支援 **重點變紅** (不會出現在一般報價單)" rows="1" oninput="autoExpand(this)" style="border-bottom: 1px dashed #d35400;"></textarea>
                 </div>
                 
@@ -177,7 +173,6 @@ h1 { font-size: 1.5rem; color: var(--primary-color); margin-bottom: 5px; }
                         <span style="color: #7f8c8d; font-weight: bold; font-size: 0.95rem;">相關費用</span>
                         <input type="number" id="extraFeeInput" class="q-input-price" style="color: #2c3e50;" value="0" oninput="calculateQuoteTotal()">
                     </div>
-                    <!-- 🔥 支援 **紅色粗體** 黑魔法 -->
                     <textarea id="extraFeeNote" class="auto-textarea" placeholder="在此填寫費用明細 支援 **重點變紅** (例: 登高費$300)" rows="1" oninput="autoExpand(this)"></textarea>
                 </div>
                 
@@ -186,7 +181,6 @@ h1 { font-size: 1.5rem; color: var(--primary-color); margin-bottom: 5px; }
                         <span style="color: #16a085; font-weight: bold; font-size: 0.95rem;">預計折扣金額</span>
                         <input type="number" id="discountInput" class="q-input-price" style="color: #16a085; border-color: #16a085;" value="0" oninput="calculateQuoteTotal()">
                     </div>
-                    <!-- 🔥 支援 **紅色粗體** 黑魔法 -->
                     <textarea id="discountNote" class="auto-textarea" placeholder="在此填寫折扣備註 支援 **重點變紅** (例: 滿8萬打85折)" rows="1" oninput="autoExpand(this)" style="color: #16a085;"></textarea>
                 </div>
                 
@@ -211,6 +205,19 @@ h1 { font-size: 1.5rem; color: var(--primary-color); margin-bottom: 5px; }
                 * 猶豫期過長可能導致商品絕版或價格異動，若需確認購買或保留庫存，請儘速電聯您的專屬家具顧問：蔡先生 (KOBE) 0983-881-494。
             </div>
             
+            <!-- 🔥 雙軌制靈魂收割陣 (雙 QR Code) -->
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-top: 20px; padding-top: 20px; border-top: 2px dashed #ecf0f1;">
+                <div style="flex: 1; text-align: center; padding: 0 10px;">
+                    <img src="423351.jpg" style="width: 100px; height: 100px; object-fit: contain; margin-bottom: 8px;" alt="HOLA APP">
+                    <div style="font-size: 0.8rem; font-weight: bold; color: #2c3e50;">掃描下載 HOLA APP</div>
+                </div>
+                
+                <div style="flex: 1; text-align: center; padding: 0 10px; border-left: 1px solid #ecf0f1;">
+                    <img id="reviewQrImg" src="" style="width: 100px; height: 100px; object-fit: contain; margin-bottom: 8px;" alt="Google Review">
+                    <div style="font-size: 0.8rem; font-weight: bold; color: #2c3e50; line-height: 1.4;">希望您能針對我的服務<br>給與Google評論</div>
+                </div>
+            </div>
+
         </div>
     </div>
 </div>
@@ -222,11 +229,12 @@ h1 { font-size: 1.5rem; color: var(--primary-color); margin-bottom: 5px; }
 </div>
 
 <script>
-// ==========================================
-// 💡 你的專屬 GAS 網址
-// ==========================================
 const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxrhh56MPO5Kw1kC3Ji66y3181amvj22KFRFhpz7lBDxKnZl0myQcuZxw0jzsPckIdILg/exec'; 
 const GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTC18jsseZH3TerLqZMzzkJc1uPjh2IVTktcs4DxiuEmpA_NRAnzKrgzZbV43FQtN8b7-vMlvv1BFGF/pub?gid=0&single=true&output=csv';
+
+// 🔥 生成那串出師表級別的 Google 評論 QR Code
+const rawReviewUrl = "Https://www.google.com/search?client=ms-android-samsung-ss&hs=Ychq&sca_esv=687af446f448273f&sxsrf=APpeQnuHw3aTDemNtdH3I9zpNh3iIGhN_g:1790409455874&q=hola+%E5%92%8C%E6%A8%82+%E5%AE%B6%E5%B1%85+%E5%8F%B0%E4%B8%AD+%E5%A4%A7+%E5%A2%A9+%E5%BA%97%E7%9A%84%E8%A9%95%E8%AB%96&uds=AJ5uw1-MsMxnPpK70E3t0kvMeEMT2HYD1FtZHZ8N4IKxk04jXRGBL0TvitIbI6u45auuipNNAzTkK8O1YI9WBVKb8XLgqzKo9mQM_It8HHQh_XXh_XJ7_ylJLFCLQoql5k3CjCUFzf2H5OZwZbTE-ia8r-eWM2wPbnvrviMWvLKUoV1LoO6BsFD4z3NhAX8RkIwilFJcmpDCDB90Rde--fwGa1GhPng_SeH6z0Hh4oEaDngjYFL-uyB4eYDXGSZpXuyYvXfJJaivEkhCcCWHL_rXLVl_qqVcyY_16fJRdSzxVN1SgrVoX6byyLObFQzfKUIa4LyXY5-doO8MQrxbfT-q9F7mWdmgZDPF_2LffE8KsZZqlLCE9AWG-vsA4sX8WN9JKeFIayVjMLvo7UQOkjdOKdtNSaNDh3oFtLhIMTKVJV6K_b4CbivZ58mBBljmde8rdO7MLzk_g3c60KIVuqAlJNd_opO8FtkSZFYKdQ19L3z_fR22iMadHgy6sn9NuUuHrT9lglHzYONWcdudjnWqJ1TDWPTA18YTuuHq91lxpX9jHNMNu6vZ5XYuzXq66Xo-VQ0vIlg-E-Ud768WhQombWaHo0neIw&si=APenkKm7iecQ4G6P-TsbSMFKIQtv3EFIqRAFw-i8uEbk55Z-_8BbuuhNMzW_T5QkJzs2QjeX2fx3CN7OBINq8ttr_UBNNndmDBeT7Fb5y787pOtPYD3Z5oTnp-5NUvOnd2phYoTVrpaZlb5R4BBGG6JucTf3krUiBsbDldHYmEv9_bbsMgkQNv8%3D&sa=X&sqi=2&ved=2ahUKEwix9fn84ouXAxXnoK8BHZNaDzcQk8gLegQIHxAB&ictx=1&stq=1&cs=0&lei=73q3avHBNOfBvr0Pk7W9uAM#ebo=1";
+document.getElementById('reviewQrImg').src = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(rawReviewUrl)}`;
 
 function autoExpand(field) {
     field.style.height = 'inherit';
@@ -443,10 +451,6 @@ function showQR(sku) { document.getElementById('modalTitle').innerText = `${sku}
 function closeModal() { document.getElementById('qrModal').style.display = 'none'; }
 fetchProducts();
 
-// ==========================================
-// 🚀 報價單與 CRM 引擎
-// ==========================================
-
 function addToQuote(sku, name, price) {
     const exist = quoteCart.find(i => i.sku === sku);
     if (exist) {
@@ -537,7 +541,6 @@ function renderQuoteItems() {
                 <span style="font-weight:bold; color:#7f8c8d;">=</span>
                 <span class="q-subtotal">$${sub.toLocaleString()}</span>
             </div>
-            <!-- 🔥 支援 **紅色粗體** 黑魔法 -->
             <textarea class="auto-textarea" placeholder="商品備註 支援 **重點變紅** (如: 尺寸/布色)" rows="1" oninput="autoExpand(this)" onchange="quoteCart[${index}].note=this.value">${item.note}</textarea>
             
             <div class="q-item-images-container">
@@ -603,9 +606,7 @@ function removeQuoteImage(itemIndex, imgIndex) {
 function calculateQuoteTotal() {
     const itemsTotal = quoteCart.reduce((sum, item) => sum + (item.price * item.qty), 0);
     const discountVal = parseInt(document.getElementById('discountInput').value) || 0;
-    
     const finalTotal = Math.max(0, itemsTotal - discountVal);
-    
     document.getElementById('quoteGrandTotal').innerText = `$${finalTotal.toLocaleString()}`;
 }
 
@@ -646,9 +647,6 @@ function saveToCRM() {
     });
 }
 
-// ==========================================
-// 🔥 終極版 DOM 抽換 + 隱身術 + 局部嗜血上色模組
-// ==========================================
 function prepareForCapture() {
     document.activeElement.blur();
     
@@ -702,13 +700,9 @@ function prepareForCapture() {
             div.innerText = ''; 
         } else { 
             let val = el.value;
-            // 🔥 局部嗜血上色黑魔法 (偵測 **文字**)
             if (el.tagName.toLowerCase() === 'textarea' && val.includes('**')) {
-                // 安全防禦，避免 HTML 注入
                 val = val.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-                // 替換雙星號為紅色粗體標籤
                 val = val.replace(/\*\*(.*?)\*\*/g, '<span style="color: #e74c3c; font-weight: 900;">$1</span>');
-                // 將換行符號轉為 <br>，保持排版
                 val = val.replace(/\n/g, '<br>');
                 div.innerHTML = val;
             } else {
