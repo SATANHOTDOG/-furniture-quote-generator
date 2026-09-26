@@ -205,10 +205,11 @@ h1 { font-size: 1.5rem; color: var(--primary-color); margin-bottom: 5px; }
                 * 猶豫期過長可能導致商品絕版或價格異動，若需確認購買或保留庫存，請儘速電聯您的專屬家具顧問：蔡先生 (KOBE) 0983-881-494。
             </div>
             
-            <!-- 🔥 雙軌制靈魂收割陣 (左：Google Drive 解析直連，右：TinyURL 短網址轉換) -->
+            <!-- 🔥 雙軌制靈魂收割陣 (左：GitHub APP.jpg，右：TinyURL 短網址) -->
             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-top: 20px; padding-top: 20px; border-top: 2px dashed #ecf0f1;">
                 <div style="flex: 1; text-align: center; padding: 0 10px;">
-                    <img src="https://drive.google.com/uc?export=view&id=1UHsvsFpEohhIAAjtU_ghN18QHV13OEcq" style="width: 100px; height: 100px; object-fit: contain; margin-bottom: 8px;" alt="HOLA APP" crossorigin="anonymous">
+                    <!-- 🔥 已修改為相對路徑讀取 GitHub 上的 APP.jpg -->
+                    <img src="./APP.jpg" style="width: 100px; height: 100px; object-fit: contain; margin-bottom: 8px;" alt="HOLA APP" crossorigin="anonymous">
                     <div style="font-size: 0.8rem; font-weight: bold; color: #2c3e50;">掃描下載 HOLA APP</div>
                 </div>
                 
@@ -232,7 +233,6 @@ h1 { font-size: 1.5rem; color: var(--primary-color); margin-bottom: 5px; }
 const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxrhh56MPO5Kw1kC3Ji66y3181amvj22KFRFhpz7lBDxKnZl0myQcuZxw0jzsPckIdILg/exec'; 
 const GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTC18jsseZH3TerLqZMzzkJc1uPjh2IVTktcs4DxiuEmpA_NRAnzKrgzZbV43FQtN8b7-vMlvv1BFGF/pub?gid=0&single=true&output=csv';
 
-// 🔥 使用 TinyURL 產生清爽乾淨的 QR Code
 const rawReviewUrl = "https://tinyurl.com/h799vfwx";
 document.getElementById('reviewQrImg').src = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(rawReviewUrl)}`;
 
