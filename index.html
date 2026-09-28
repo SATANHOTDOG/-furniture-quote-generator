@@ -295,7 +295,6 @@ let renderLimit = 100;
 let quoteCart = []; 
 let isBossMode = false;
 
-// 預設換檔精靈的日期為今天
 document.getElementById('wizardDate').valueAsDate = new Date();
 
 async function fetchProducts() {
@@ -351,43 +350,47 @@ function parseCSVLine(line) {
     return values.map(v => v.replace(/^["']|["']$/g, ''));
 }
 
-// 供畫面渲染使用的：抓取「現在(今天)」最符合的檔期價格
-function getActiveShortestPromo(promoPriceStr, promoPeriodStr) {
-    return getPriceAndPeriodOnDate(promoPriceStr, promoPeriodStr, new Date());
-}
-
-// 核心時間機器：丟任意日期進去，幫你算出當天這鬼東西到底賣多少錢
+// 🔥 修復版：現在系統會嚴格檢查所有檔期，不會再因為「只有一個檔期」就無條件放行了
 function getPriceAndPeriodOnDate(promoPriceStr, promoPeriodStr, targetDateObj) {
     if (!promoPriceStr || !promoPeriodStr) return { price: '', period: '' };
     const prices = promoPriceStr.split('|').map(s => s.trim());
     const periods = promoPeriodStr.split('|').map(s => s.trim());
-    
-    if (prices.length !== periods.length || periods.length === 1) {
-        return { price: prices[0] || '', period: periods[0] || '' };
-    }
     
     let bestPromo = null;
     let minDuration = Infinity;
     
     for (let i = 0; i < periods.length; i++) {
         const parts = periods[i].split('~');
+        const priceMatch = prices[i] !== undefined ? prices[i] : prices[0];
+        
         if (parts.length === 2) {
-            const start = new Date(parts[0].trim().replace(/\//g, '-') + "T00:00:00");
-            const end = new Date(parts[1].trim().replace(/\//g, '-') + "T23:59:59");
+            // 替換掉可能出包的連字號，改用安全的斜線格式
+            const startStr = parts[0].trim().replace(/-/g, '/');
+            const endStr = parts[1].trim().replace(/-/g, '/');
+            const start = new Date(startStr + " 00:00:00");
+            const end = new Date(endStr + " 23:59:59");
             
             if (targetDateObj >= start && targetDateObj <= end) {
                 const duration = end - start;
                 if (duration < minDuration) {
                     minDuration = duration;
-                    bestPromo = { price: prices[i], period: periods[i] };
+                    bestPromo = { price: priceMatch, period: periods[i] };
                 }
+            }
+        } else {
+            // 如果公司沒押日期（例如寫：售完為止），就當作無限期特價
+            if (Infinity <= minDuration) {
+                bestPromo = { price: priceMatch, period: periods[i] };
             }
         }
     }
     return bestPromo || { price: '', period: '' };
 }
 
-// 換檔精靈專用的純粹價格計算器
+function getActiveShortestPromo(promoPriceStr, promoPeriodStr) {
+    return getPriceAndPeriodOnDate(promoPriceStr, promoPeriodStr, new Date());
+}
+
 function getRawPriceOnDate(p, targetDateObj) {
     const getVal = (key) => p[key] || p[` ${key}`] || p[`${key} `] || p[Object.keys(p).find(k => k.trim() === key)] || '';
     const origPriceStr = getVal('一般售價') || '0';
@@ -405,7 +408,6 @@ function getRawPriceOnDate(p, targetDateObj) {
     return origPrice;
 }
 
-// 🔥 換檔精靈：主邏輯區塊 🔥
 let wizardDropList = [];
 let wizardRiseList = [];
 
@@ -413,9 +415,9 @@ function runWizard() {
     const dateStr = document.getElementById('wizardDate').value;
     if(!dateStr) return alert('你連日期都不選，我是要幫你通靈嗎？');
     
-    // 設定生效日中午 12 點 (避開時區邊緣誤差)
-    const targetDate = new Date(dateStr + "T12:00:00");
-    // 抓取前一天
+    // 安全解析日期，避免某些手機把 YYYY-MM-DD 解析成奇怪的時區
+    const safeDateStr = dateStr.replace(/-/g, '/'); 
+    const targetDate = new Date(safeDateStr + " 12:00:00");
     const prevDate = new Date(targetDate.getTime() - 24 * 60 * 60 * 1000);
     
     wizardDropList = [];
@@ -426,7 +428,6 @@ function runWizard() {
         const h630Stock = parseInt(getVal('HOLA630庫存') || '0');
         const h630Show = parseInt(getVal('HOLA630展示') || '0');
         
-        // 公司發 Event 瘋狂印牌，但我們只做「店內有實體」的
         if(h630Stock > 0 || h630Show > 0) {
             const priceTarget = getRawPriceOnDate(p, targetDate);
             const pricePrev = getRawPriceOnDate(p, prevDate);
@@ -450,13 +451,11 @@ function exportWizardCSV(type) {
     const list = type === 'drop' ? wizardDropList : wizardRiseList;
     if(list.length === 0) return alert('清單是空的，恭喜你這部份不用做牌子，你可以去泡咖啡了！');
     
-    // 為了應付公司那套死不進步的老系統，A1 直接塞 'SKU' 當標題墊背
     let csvContent = "SKU\n"; 
     list.forEach(sku => {
         csvContent += `${sku}\n`; 
     });
     
-    // 加上 BOM 讓 Excel 認得 UTF-8，免得萬一出亂碼
     const blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]), csvContent], {type: "text/csv;charset=utf-8;"});
     const link = document.createElement("a");
     const url = URL.createObjectURL(blob);
