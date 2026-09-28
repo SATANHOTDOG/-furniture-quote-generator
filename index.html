@@ -18,7 +18,8 @@ h1 { font-size: 1.5rem; color: var(--primary-color); margin-bottom: 5px; }
 .subtitle { font-size: 0.85rem; color: var(--text-muted); }
 .search-container { position: sticky; top: 10px; z-index: 100; margin-bottom: 20px; background: var(--bg-color); padding-bottom: 10px; }
 .search-box { width: 100%; padding: 14px 20px; font-size: 1.1rem; border: 2px solid var(--primary-color); border-radius: 12px; outline: none; transition: all 0.2s ease; }
-.filter-bar { margin-top: 12px; display: flex; gap: 12px; flex-wrap: wrap; }
+.filter-bar { margin-top: 12px; display: flex; gap: 12px; flex-wrap: wrap; align-items: center; justify-content: space-between; }
+.checkbox-group { display: flex; gap: 12px; flex-wrap: wrap; }
 .checkbox-container { display: flex; align-items: center; cursor: pointer; font-size: 0.95rem; color: var(--primary-color); font-weight: 600; }
 .checkbox-container input { margin-right: 6px; width: 18px; height: 18px; }
 .status-bar { display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px; padding: 0 5px; }
@@ -113,6 +114,9 @@ h1 { font-size: 1.5rem; color: var(--primary-color); margin-bottom: 5px; }
 
 .capture-clone { white-space: pre-wrap; word-break: break-word; color: #2c3e50; font-size: 0.95rem; line-height: 1.4; display: block; width: 100%; }
 .capture-clone-inline { display: inline-block; width: auto; padding: 0 5px; }
+
+/* 換檔精靈按鈕專屬樣式 */
+.btn-wizard { background: linear-gradient(135deg, #8e44ad, #9b59b6); color: white; padding: 6px 12px; border-radius: 8px; font-size: 0.9rem; font-weight: bold; border: none; box-shadow: 0 2px 5px rgba(142,68,173,0.3); }
 </style>
 </head>
 <body>
@@ -123,8 +127,11 @@ h1 { font-size: 1.5rem; color: var(--primary-color); margin-bottom: 5px; }
 <div class="search-container">
 <input type="text" id="searchInput" class="search-box" placeholder="輸入 SKU 貨號或商品名稱搜尋..." disabled>
 <div class="filter-bar">
-<label class="checkbox-container"><input type="checkbox" id="stockFilter">⚡ 楊梅有現貨</label>
-<label class="checkbox-container"><input type="checkbox" id="shopFilter">🏪 630現貨或展示>0</label>
+    <div class="checkbox-group">
+        <label class="checkbox-container"><input type="checkbox" id="stockFilter">⚡ 楊梅有現貨</label>
+        <label class="checkbox-container"><input type="checkbox" id="shopFilter">🏪 630現貨或展示>0</label>
+    </div>
+    <button class="btn-wizard" onclick="document.getElementById('wizardModal').style.display='flex'">🗓️ 換檔精靈</button>
 </div>
 <button id="cameraBtn" class="btn btn-secondary" style="width: 100%; margin-top: 15px; margin-bottom: 5px; font-weight: bold; background: #2980b9; color: white; padding: 12px;">📸 喚醒原生相機拍照掃描</button>
 <input type="file" id="qrInput" accept="image/*" capture="environment" style="display: none;">
@@ -140,6 +147,41 @@ h1 { font-size: 1.5rem; color: var(--primary-color); margin-bottom: 5px; }
 <img id="qrImage" src="" alt="QR Code" style="margin: 15px 0; max-width: 100%;">
 <button class="btn btn-secondary" style="width: 100%; margin-top: 10px;" onclick="closeModal()">關閉視窗</button>
 </div>
+</div>
+
+<!-- 🔥 換檔精靈 Modal 🔥 -->
+<div id="wizardModal" class="modal" onclick="document.getElementById('wizardModal').style.display='none'">
+    <div class="modal-content" onclick="event.stopPropagation()" style="text-align: left;">
+        <h3 style="color: #8e44ad; margin-bottom: 5px; text-align: center; font-size: 1.3rem;">🗓️ 換檔 POP 精靈</h3>
+        <p style="font-size: 0.8rem; color: #7f8c8d; margin-bottom: 15px; text-align: center; line-height: 1.4;">
+            系統將自動抓出「店內有庫存/展示」且在指定日期發生價格變動的 SKU，讓你不用再對 Excel 對到脫窗。
+        </p>
+        <div style="margin-bottom: 15px;">
+            <label style="font-weight: bold; color: #2c3e50; font-size: 0.95rem;">📅 選擇新檔期生效日：</label>
+            <input type="date" id="wizardDate" style="width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #bdc3c7; border-radius: 6px; font-size: 1rem; outline: none;">
+        </div>
+        <button class="btn" style="width: 100%; background: #2c3e50; color: white; margin-bottom: 15px;" onclick="runWizard()">🔍 開始透視價格變化</button>
+        
+        <div id="wizardResult" style="display: none; background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #e9ecef;">
+            <div style="color: #e74c3c; font-weight: bold; margin-bottom: 10px; font-size: 1.1rem; display: flex; justify-content: space-between;">
+                <span>📉 進入特價 (新活動)</span>
+                <span id="wizardDropCount" style="background: #fadbd8; padding: 2px 8px; border-radius: 12px;">0</span>
+            </div>
+            <div style="color: #27ae60; font-weight: bold; font-size: 1.1rem; display: flex; justify-content: space-between;">
+                <span>📈 恢復原價 (檔期結束)</span>
+                <span id="wizardRiseCount" style="background: #d5f5e3; padding: 2px 8px; border-radius: 12px;">0</span>
+            </div>
+            <div style="font-size: 0.75rem; color: #95a5a6; margin-top: 10px; text-align: center;">
+                * 匯出的 CSV 檔 A1 已貼心留為「SKU」標題，請自行另存為 Excel 97-2003 活頁簿匯入老舊系統。
+            </div>
+        </div>
+        
+        <div id="wizardActions" style="display: none; flex-direction: column; gap: 10px;">
+            <button class="btn" style="background: #e74c3c; color: white;" onclick="exportWizardCSV('drop')">📥 匯出【進入特價】印牌清單</button>
+            <button class="btn" style="background: #27ae60; color: white;" onclick="exportWizardCSV('rise')">📥 匯出【恢復原價】印牌清單</button>
+        </div>
+        <button class="btn btn-secondary" style="width: 100%; margin-top: 15px;" onclick="document.getElementById('wizardModal').style.display='none'">關閉</button>
+    </div>
 </div>
 
 <div id="cartFab" onclick="toggleQuoteApp()">
@@ -212,7 +254,7 @@ h1 { font-size: 1.5rem; color: var(--primary-color); margin-bottom: 5px; }
                 * 猶豫期過長可能導致商品絕版或價格異動，若需確認購買或保留庫存，請儘速電聯您的專屬家具顧問：蔡先生 (KOBE) 0983-881-494。
             </div>
             
-            <!-- 底部雙 QR Code 區塊：左邊 APP.jpg，右邊 Google 評論 QR Code -->
+            <!-- 底部雙 QR Code 區塊 -->
             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-top: 20px; padding-top: 20px; border-top: 2px dashed #ecf0f1;">
                 <div style="flex: 1; text-align: center; padding: 0 10px;">
                     <img src="./APP.jpg" style="width: 80px; height: 80px; object-fit: contain; margin-bottom: 8px;" alt="HOLA APP" crossorigin="anonymous">
@@ -239,7 +281,6 @@ h1 { font-size: 1.5rem; color: var(--primary-color); margin-bottom: 5px; }
 const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxrhh56MPO5Kw1kC3Ji66y3181amvj22KFRFhpz7lBDxKnZl0myQcuZxw0jzsPckIdILg/exec'; 
 const GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTC18jsseZH3TerLqZMzzkJc1uPjh2IVTktcs4DxiuEmpA_NRAnzKrgzZbV43FQtN8b7-vMlvv1BFGF/pub?gid=0&single=true&output=csv';
 
-// 🔥 確保 Google 評論的縮短網址有確實組裝進去
 const rawReviewUrl = "https://tinyurl.com/h799vfwx";
 document.getElementById('reviewQrImg').src = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(rawReviewUrl)}`;
 
@@ -253,6 +294,9 @@ let currentFiltered = [];
 let renderLimit = 100;
 let quoteCart = []; 
 let isBossMode = false;
+
+// 預設換檔精靈的日期為今天
+document.getElementById('wizardDate').valueAsDate = new Date();
 
 async function fetchProducts() {
     try {
@@ -307,7 +351,13 @@ function parseCSVLine(line) {
     return values.map(v => v.replace(/^["']|["']$/g, ''));
 }
 
+// 供畫面渲染使用的：抓取「現在(今天)」最符合的檔期價格
 function getActiveShortestPromo(promoPriceStr, promoPeriodStr) {
+    return getPriceAndPeriodOnDate(promoPriceStr, promoPeriodStr, new Date());
+}
+
+// 核心時間機器：丟任意日期進去，幫你算出當天這鬼東西到底賣多少錢
+function getPriceAndPeriodOnDate(promoPriceStr, promoPeriodStr, targetDateObj) {
     if (!promoPriceStr || !promoPeriodStr) return { price: '', period: '' };
     const prices = promoPriceStr.split('|').map(s => s.trim());
     const periods = promoPeriodStr.split('|').map(s => s.trim());
@@ -316,7 +366,6 @@ function getActiveShortestPromo(promoPriceStr, promoPeriodStr) {
         return { price: prices[0] || '', period: periods[0] || '' };
     }
     
-    const now = new Date();
     let bestPromo = null;
     let minDuration = Infinity;
     
@@ -326,7 +375,7 @@ function getActiveShortestPromo(promoPriceStr, promoPeriodStr) {
             const start = new Date(parts[0].trim().replace(/\//g, '-') + "T00:00:00");
             const end = new Date(parts[1].trim().replace(/\//g, '-') + "T23:59:59");
             
-            if (now >= start && now <= end) {
+            if (targetDateObj >= start && targetDateObj <= end) {
                 const duration = end - start;
                 if (duration < minDuration) {
                     minDuration = duration;
@@ -336,6 +385,89 @@ function getActiveShortestPromo(promoPriceStr, promoPeriodStr) {
         }
     }
     return bestPromo || { price: '', period: '' };
+}
+
+// 換檔精靈專用的純粹價格計算器
+function getRawPriceOnDate(p, targetDateObj) {
+    const getVal = (key) => p[key] || p[` ${key}`] || p[`${key} `] || p[Object.keys(p).find(k => k.trim() === key)] || '';
+    const origPriceStr = getVal('一般售價') || '0';
+    const origPrice = parseInt(origPriceStr.replace(/,/g, '')) || 0;
+    
+    let rawPromoPrice = getVal('促銷售價');
+    if(rawPromoPrice === '#N/A' || rawPromoPrice === '0') rawPromoPrice = '';
+    let rawPromoPeriod = getVal('促銷期間');
+    if(rawPromoPeriod === '#N/A') rawPromoPeriod = '';
+    
+    const promoData = getPriceAndPeriodOnDate(rawPromoPrice, rawPromoPeriod, targetDateObj);
+    if (promoData.price !== '') {
+        return parseInt(promoData.price.replace(/,/g, '')) || origPrice;
+    }
+    return origPrice;
+}
+
+// 🔥 換檔精靈：主邏輯區塊 🔥
+let wizardDropList = [];
+let wizardRiseList = [];
+
+function runWizard() {
+    const dateStr = document.getElementById('wizardDate').value;
+    if(!dateStr) return alert('你連日期都不選，我是要幫你通靈嗎？');
+    
+    // 設定生效日中午 12 點 (避開時區邊緣誤差)
+    const targetDate = new Date(dateStr + "T12:00:00");
+    // 抓取前一天
+    const prevDate = new Date(targetDate.getTime() - 24 * 60 * 60 * 1000);
+    
+    wizardDropList = [];
+    wizardRiseList = [];
+    
+    products.forEach(p => {
+        const getVal = (key) => p[key] || p[` ${key}`] || p[`${key} `] || p[Object.keys(p).find(k => k.trim() === key)] || '';
+        const h630Stock = parseInt(getVal('HOLA630庫存') || '0');
+        const h630Show = parseInt(getVal('HOLA630展示') || '0');
+        
+        // 公司發 Event 瘋狂印牌，但我們只做「店內有實體」的
+        if(h630Stock > 0 || h630Show > 0) {
+            const priceTarget = getRawPriceOnDate(p, targetDate);
+            const pricePrev = getRawPriceOnDate(p, prevDate);
+            const sku = getVal('SKU');
+            
+            if(priceTarget < pricePrev) {
+                wizardDropList.push(sku); // 降價 -> 進入特價
+            } else if(priceTarget > pricePrev) {
+                wizardRiseList.push(sku); // 漲價 -> 恢復原價
+            }
+        }
+    });
+    
+    document.getElementById('wizardDropCount').innerText = wizardDropList.length;
+    document.getElementById('wizardRiseCount').innerText = wizardRiseList.length;
+    document.getElementById('wizardResult').style.display = 'block';
+    document.getElementById('wizardActions').style.display = 'flex';
+}
+
+function exportWizardCSV(type) {
+    const list = type === 'drop' ? wizardDropList : wizardRiseList;
+    if(list.length === 0) return alert('清單是空的，恭喜你這部份不用做牌子，你可以去泡咖啡了！');
+    
+    // 為了應付公司那套死不進步的老系統，A1 直接塞 'SKU' 當標題墊背
+    let csvContent = "SKU\n"; 
+    list.forEach(sku => {
+        csvContent += `${sku}\n`; 
+    });
+    
+    // 加上 BOM 讓 Excel 認得 UTF-8，免得萬一出亂碼
+    const blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]), csvContent], {type: "text/csv;charset=utf-8;"});
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    const dateStr = document.getElementById('wizardDate').value.replace(/-/g, '');
+    
+    link.setAttribute("href", url);
+    link.setAttribute("download", `換檔POP_${dateStr}_${type === 'drop' ? '新特價' : '恢復原價'}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
 }
 
 function filterAndRender() {
