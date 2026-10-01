@@ -33,6 +33,7 @@ h1 { font-size: 1.5rem; color: var(--primary-color); margin-bottom: 5px; }
 .stock-title { font-size: 0.75rem; color: var(--text-muted); }
 .stock-val { font-size: 1.1rem; font-weight: bold; color: var(--primary-color); }
 .stock-val.has-stock { color: var(--success-color); }
+.stock-val.negative-stock { color: #e74c3c; }
 .price-section { margin-bottom: 12px; }
 .price-row { display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; margin-bottom: 4px; }
 .price-orig { text-decoration: line-through; color: #95a5a6; }
@@ -115,8 +116,9 @@ h1 { font-size: 1.5rem; color: var(--primary-color); margin-bottom: 5px; }
 .capture-clone { white-space: pre-wrap; word-break: break-word; color: #2c3e50; font-size: 0.95rem; line-height: 1.4; display: block; width: 100%; }
 .capture-clone-inline { display: inline-block; width: auto; padding: 0 5px; }
 
-/* 換檔精靈按鈕專屬樣式 */
-.btn-wizard { background: linear-gradient(135deg, #8e44ad, #9b59b6); color: white; padding: 6px 12px; border-radius: 8px; font-size: 0.9rem; font-weight: bold; border: none; box-shadow: 0 2px 5px rgba(142,68,173,0.3); }
+/* 換檔精靈與特殊篩選按鈕專屬樣式 */
+.btn-wizard { background: linear-gradient(135deg, #8e44ad, #9b59b6); color: white; padding: 6px 12px; border-radius: 8px; font-size: 0.9rem; font-weight: bold; border: none; box-shadow: 0 2px 5px rgba(142,68,173,0.3); cursor: pointer; }
+.btn-special { background: linear-gradient(135deg, #e67e22, #d35400); color: white; padding: 6px 12px; border-radius: 8px; font-size: 0.9rem; font-weight: bold; border: none; box-shadow: 0 2px 5px rgba(230,126,34,0.3); cursor: pointer; outline: none; }
 
 /* 換檔精靈內部樣式 */
 .wizard-box { border: 1px solid #e9ecef; padding: 12px; border-radius: 8px; margin-bottom: 15px; background: #fff; text-align: left; }
@@ -136,7 +138,15 @@ h1 { font-size: 1.5rem; color: var(--primary-color); margin-bottom: 5px; }
         <label class="checkbox-container"><input type="checkbox" id="stockFilter">⚡ 楊梅有現貨</label>
         <label class="checkbox-container"><input type="checkbox" id="shopFilter">🏪 630現貨或展示>0</label>
     </div>
-    <button class="btn-wizard" onclick="openWizard()">🗓️ 換檔精靈</button>
+    <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+        <select id="specialFilter" class="btn-special" style="margin-bottom: 5px;" onchange="filterAndRender()">
+            <option value="" style="background: #fff; color: #333;">🔥 特殊篩選 (無)</option>
+            <option value="negative" style="background: #fff; color: #333;">負庫存</option>
+            <option value="stock_no_show" style="background: #fff; color: #333;">有庫無展</option>
+            <option value="clearance" style="background: #fff; color: #333;">出清篩選</option>
+        </select>
+        <button class="btn-wizard" style="margin-bottom: 5px;" onclick="openWizard()">🗓️ 換檔精靈</button>
+    </div>
 </div>
 <button id="cameraBtn" class="btn btn-secondary" style="width: 100%; margin-top: 15px; margin-bottom: 5px; font-weight: bold; background: #2980b9; color: white; padding: 12px;">📸 喚醒原生相機拍照掃描</button>
 <input type="file" id="qrInput" accept="image/*" capture="environment" style="display: none;">
@@ -426,7 +436,6 @@ function getWizardTargetSKUs(targetDateObj, prevDateObj) {
     const chkStock = document.getElementById('wizChkStock').checked;
     const chkShow = document.getElementById('wizChkShow').checked;
     
-    // 如果什麼都沒勾，直接回傳空值
     if (!chkStock && !chkShow) return { drop: [], rise: [] };
 
     products.forEach(p => {
@@ -436,13 +445,11 @@ function getWizardTargetSKUs(targetDateObj, prevDateObj) {
         if (chkStock) targetQty += parseInt(getVal('HOLA630庫存') || '0');
         if (chkShow) targetQty += parseInt(getVal('HOLA630展示') || '0');
         
-        // 只針對「勾選後數量>0」的商品進行比對
         if (targetQty > 0) {
             const priceTarget = getRawPriceOnDate(p, targetDateObj);
             const pricePrev = getRawPriceOnDate(p, prevDateObj);
             const sku = getVal('SKU');
             
-            // 數量倍增寫法：數量是幾，就塞幾筆相同的 SKU 進陣列
             if (priceTarget < pricePrev) {
                 for (let i = 0; i < targetQty; i++) dropList.push(sku);
             } else if (priceTarget > pricePrev) {
@@ -457,7 +464,6 @@ function getWizardTargetSKUs(targetDateObj, prevDateObj) {
 function doExportExcel(skuList, typeName, dateStr) {
     if (!skuList || skuList.length === 0) return alert('這張清單是空的，去泡咖啡吧！');
     
-    // 透過 HTML table 包裝，加上 mso-number-format 強制轉文字，微軟系統絕對乖乖聽話
     let htmlTable = `
         <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
         <head>
@@ -485,7 +491,6 @@ function doExportExcel(skuList, typeName, dateStr) {
     const link = document.createElement("a");
     const url = URL.createObjectURL(blob);
     
-    // 直接存成 .xls 格式
     link.setAttribute("href", url);
     link.setAttribute("download", `換檔POP_${dateStr}_${typeName}.xls`);
     link.style.visibility = 'hidden';
@@ -506,7 +511,6 @@ function scanNext5Days() {
         let foundAny = false;
         let html = '';
         
-        // 掃描範圍：包含今天(0) 到 未來5天(5)
         for(let i = 0; i <= 5; i++) {
             const tDate = new Date(today.getTime() + i * 24 * 60 * 60 * 1000);
             const pDate = new Date(tDate.getTime() - 24 * 60 * 60 * 1000);
@@ -585,11 +589,13 @@ function refreshWizard() {
 }
 
 
-// --- 以下為原有核心與報價單功能，完全不影響 ---
+// --- 核心過濾器 (加入特殊篩選霸王條款) ---
 function filterAndRender() {
     const query = document.getElementById('searchInput').value.toLowerCase().trim();
     const onlyYangmei = document.getElementById('stockFilter').checked;
     const onlyShop = document.getElementById('shopFilter').checked;
+    const specialFilter = document.getElementById('specialFilter').value;
+    
     currentFiltered = products.filter(p => {
         const getVal = (key) => p[key] || p[` ${key}`] || p[`${key} `] || p[Object.keys(p).find(k => k.trim() === key)] || '';
         const sku = getVal('SKU').toLowerCase();
@@ -597,13 +603,31 @@ function filterAndRender() {
         const ymStock = parseInt(getVal('楊梅庫存') || '0');
         const h630Stock = parseInt(getVal('HOLA630庫存') || '0');
         const h630Show = parseInt(getVal('HOLA630展示') || '0');
+        const statusRaw = getVal('商品狀態') || '';
+        
         const matchText = sku.includes(query) || name.includes(query);
         const matchYangmei = onlyYangmei ? (ymStock > 0) : true;
-        const matchShop = onlyShop ? (h630Stock > 0 || h630Show > 0) : true;
-        return matchText && matchYangmei && matchShop;
+        
+        // 預設店面篩選
+        let matchShop = onlyShop ? (h630Stock > 0 || h630Show > 0) : true;
+        let passSpecial = true;
+        
+        // 特殊篩選霸王條款：只要啟用，強制覆寫 matchShop 避免互斥被擋掉
+        if (specialFilter === 'negative') {
+            passSpecial = (h630Stock < 0 || h630Show < 0);
+            matchShop = true; 
+        } else if (specialFilter === 'stock_no_show') {
+            passSpecial = (h630Stock > 0 && h630Show === 0 && !name.includes('毯'));
+            matchShop = true;
+        } else if (specialFilter === 'clearance') {
+            passSpecial = (statusRaw.toUpperCase() === 'D' && (h630Stock > 0 || h630Show > 0));
+            matchShop = true;
+        }
+        
+        return matchText && matchYangmei && matchShop && passSpecial;
     });
     
-    document.getElementById('dataCount').innerText = query || onlyYangmei || onlyShop 
+    document.getElementById('dataCount').innerText = query || onlyYangmei || onlyShop || specialFilter
         ? `過濾結果：${currentFiltered.length} 筆` 
         : `共載入 ${products.length} 筆商品資料`;
         
@@ -672,8 +696,8 @@ function renderProducts() {
         <div class="card-header"><span class="sku-tag">SKU: ${sku}</span><div class="item-name">${name}</div></div>
         <div class="stock-section">
         <div class="stock-box"><span class="stock-title">楊梅庫存</span><span class="stock-val ${ymStock > 0 ? 'has-stock' : ''}">${ymStock}</span></div>
-        <div class="stock-box"><span class="stock-title">HOLA630</span><span class="stock-val ${h630Stock > 0 ? 'has-stock' : ''}">${h630Stock}</span></div>
-        <div class="stock-box"><span class="stock-title">630展示</span><span class="stock-val ${h630Show > 0 ? 'has-stock' : ''}">${h630Show}</span></div>
+        <div class="stock-box"><span class="stock-title">HOLA630</span><span class="stock-val ${h630Stock > 0 ? 'has-stock' : (h630Stock < 0 ? 'negative-stock' : '')}">${h630Stock}</span></div>
+        <div class="stock-box"><span class="stock-title">630展示</span><span class="stock-val ${h630Show > 0 ? 'has-stock' : (h630Show < 0 ? 'negative-stock' : '')}">${h630Show}</span></div>
         </div>
         <div class="price-section">
         <div class="price-row"><span class="price-label">一般售價</span><span class="${promoPrice ? 'price-orig' : 'price-promo'}">$${origPrice}</span></div>
