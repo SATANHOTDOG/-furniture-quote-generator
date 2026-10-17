@@ -145,6 +145,8 @@ h1 { font-size: 1.5rem; color: var(--primary-color); margin-bottom: 5px; }
             <option value="negative" style="background: #fff; color: #333;">負庫存</option>
             <option value="stock_no_show" style="background: #fff; color: #333;">有庫無展</option>
             <option value="clearance" style="background: #fff; color: #333;">出清篩選</option>
+            <option value="display_recommend" style="background: #fff; color: #333;">陳列推薦</option>
+            <option value="photo_missing" style="background: #fff; color: #333;">照片增加</option>
         </select>
         <button class="btn-wizard" style="margin-bottom: 5px;" onclick="openWizard()">🗓️ 換檔精靈</button>
     </div>
@@ -606,28 +608,31 @@ function filterAndRender() {
         const h630Stock = parseInt(getVal('HOLA630庫存') || '0');
         const h630Show = parseInt(getVal('HOLA630展示') || '0');
         const statusRaw = getVal('商品狀態') || '';
+        const hasPhoto = Object.values(p).some(val => typeof val === 'string' && val.includes('有照片'));
         
         const matchText = sku.includes(query) || name.includes(query);
-        const matchYangmei = onlyYangmei ? (ymStock > 0) : true;
         
-        // 嚴格交集邏輯
+        let matchYangmei = onlyYangmei ? (ymStock > 0) : true;
         let matchShopStock = onlyShopStock ? (h630Stock > 0) : true;
         let matchShopShow = onlyShopShow ? (h630Show > 0) : true;
         let passSpecial = true;
         
-        // 特殊篩選霸王條款：只要啟用，強制覆寫 matchShop 避免互斥被擋掉
+        // 特殊篩選霸王條款：只要啟用，強制覆寫其他 checkbox 避免互斥被擋掉
         if (specialFilter === 'negative') {
             passSpecial = (h630Stock < 0 || h630Show < 0);
-            matchShopStock = true;
-            matchShopShow = true;
+            matchShopStock = true; matchShopShow = true; matchYangmei = true;
         } else if (specialFilter === 'stock_no_show') {
             passSpecial = (h630Stock > 0 && h630Show === 0 && !name.includes('毯'));
-            matchShopStock = true;
-            matchShopShow = true;
+            matchShopStock = true; matchShopShow = true; matchYangmei = true;
         } else if (specialFilter === 'clearance') {
             passSpecial = (statusRaw.toUpperCase() === 'D' && (h630Stock > 0 || h630Show > 0));
-            matchShopStock = true;
-            matchShopShow = true;
+            matchShopStock = true; matchShopShow = true; matchYangmei = true;
+        } else if (specialFilter === 'display_recommend') {
+            passSpecial = (ymStock > 0 && h630Show === 0);
+            matchShopStock = true; matchShopShow = true; matchYangmei = true;
+        } else if (specialFilter === 'photo_missing') {
+            passSpecial = (h630Show > 0 && !hasPhoto);
+            matchShopStock = true; matchShopShow = true; matchYangmei = true;
         }
         
         return matchText && matchYangmei && matchShopStock && matchShopShow && passSpecial;
