@@ -136,7 +136,8 @@ h1 { font-size: 1.5rem; color: var(--primary-color); margin-bottom: 5px; }
 <div class="filter-bar">
     <div class="checkbox-group">
         <label class="checkbox-container"><input type="checkbox" id="stockFilter">⚡ 楊梅有現貨</label>
-        <label class="checkbox-container"><input type="checkbox" id="shopFilter">🏪 630現貨或展示>0</label>
+        <label class="checkbox-container"><input type="checkbox" id="shopStockFilter">📦 店內庫存</label>
+        <label class="checkbox-container"><input type="checkbox" id="shopShowFilter">🛋️ 店內展示</label>
     </div>
     <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
         <select id="specialFilter" class="btn-special" style="margin-bottom: 5px;" onchange="filterAndRender()">
@@ -593,7 +594,8 @@ function refreshWizard() {
 function filterAndRender() {
     const query = document.getElementById('searchInput').value.toLowerCase().trim();
     const onlyYangmei = document.getElementById('stockFilter').checked;
-    const onlyShop = document.getElementById('shopFilter').checked;
+    const onlyShopStock = document.getElementById('shopStockFilter').checked;
+    const onlyShopShow = document.getElementById('shopShowFilter').checked;
     const specialFilter = document.getElementById('specialFilter').value;
     
     currentFiltered = products.filter(p => {
@@ -608,26 +610,30 @@ function filterAndRender() {
         const matchText = sku.includes(query) || name.includes(query);
         const matchYangmei = onlyYangmei ? (ymStock > 0) : true;
         
-        // 預設店面篩選
-        let matchShop = onlyShop ? (h630Stock > 0 || h630Show > 0) : true;
+        // 嚴格交集邏輯
+        let matchShopStock = onlyShopStock ? (h630Stock > 0) : true;
+        let matchShopShow = onlyShopShow ? (h630Show > 0) : true;
         let passSpecial = true;
         
         // 特殊篩選霸王條款：只要啟用，強制覆寫 matchShop 避免互斥被擋掉
         if (specialFilter === 'negative') {
             passSpecial = (h630Stock < 0 || h630Show < 0);
-            matchShop = true; 
+            matchShopStock = true;
+            matchShopShow = true;
         } else if (specialFilter === 'stock_no_show') {
             passSpecial = (h630Stock > 0 && h630Show === 0 && !name.includes('毯'));
-            matchShop = true;
+            matchShopStock = true;
+            matchShopShow = true;
         } else if (specialFilter === 'clearance') {
             passSpecial = (statusRaw.toUpperCase() === 'D' && (h630Stock > 0 || h630Show > 0));
-            matchShop = true;
+            matchShopStock = true;
+            matchShopShow = true;
         }
         
-        return matchText && matchYangmei && matchShop && passSpecial;
+        return matchText && matchYangmei && matchShopStock && matchShopShow && passSpecial;
     });
     
-    document.getElementById('dataCount').innerText = query || onlyYangmei || onlyShop || specialFilter
+    document.getElementById('dataCount').innerText = query || onlyYangmei || onlyShopStock || onlyShopShow || specialFilter
         ? `過濾結果：${currentFiltered.length} 筆` 
         : `共載入 ${products.length} 筆商品資料`;
         
@@ -741,7 +747,8 @@ function renderProducts() {
 function loadMore() { renderLimit += 100; renderProducts(); }
 document.getElementById('searchInput').addEventListener('input', filterAndRender);
 document.getElementById('stockFilter').addEventListener('change', filterAndRender);
-document.getElementById('shopFilter').addEventListener('change', filterAndRender);
+document.getElementById('shopStockFilter').addEventListener('change', filterAndRender);
+document.getElementById('shopShowFilter').addEventListener('change', filterAndRender);
 function showQR(sku) { document.getElementById('modalTitle').innerText = `${sku}`; document.getElementById('qrImage').src = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https://www.hola.com.tw/p/${sku}`; document.getElementById('qrModal').style.display = 'flex'; }
 function closeModal() { document.getElementById('qrModal').style.display = 'none'; }
 fetchProducts();
