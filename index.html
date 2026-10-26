@@ -135,6 +135,7 @@ h1 { font-size: 1.5rem; color: var(--primary-color); margin-bottom: 5px; }
 <label class="checkbox-container"><input type="checkbox" id="stockFilter">⚡ 楊梅有現貨</label>
 <label class="checkbox-container"><input type="checkbox" id="shopStockFilter">📦 店內庫存</label>
 <label class="checkbox-container"><input type="checkbox" id="shopShowFilter">🛋️ 店內展示</label>
+<label class="checkbox-container"><input type="checkbox" id="photoOnlyFilter">📸 有照片</label>
 </div>
 <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
 <select id="specialFilter" class="btn-special" style="margin-bottom: 5px;" onchange="filterAndRender()">
@@ -537,6 +538,7 @@ const query = document.getElementById('searchInput').value.toLowerCase().trim();
 const onlyYangmei = document.getElementById('stockFilter').checked;
 const onlyShopStock = document.getElementById('shopStockFilter').checked;
 const onlyShopShow = document.getElementById('shopShowFilter').checked;
+const onlyWithPhoto = document.getElementById('photoOnlyFilter').checked;
 const specialFilter = document.getElementById('specialFilter').value;
 
 currentFiltered = products.filter(p => {
@@ -552,18 +554,19 @@ const hasPhoto = Object.values(p).some(val => typeof val === 'string' && val.inc
 let matchYangmei = onlyYangmei ? (ymStock > 0) : true;
 let matchShopStock = onlyShopStock ? (h630Stock > 0) : true;
 let matchShopShow = onlyShopShow ? (h630Show > 0) : true;
+let matchPhoto = onlyWithPhoto ? hasPhoto : true;
 let passSpecial = true;
 
-if (specialFilter === 'negative') { passSpecial = (h630Stock < 0 || h630Show < 0); matchShopStock = matchShopShow = matchYangmei = true; }
-else if (specialFilter === 'stock_no_show') { passSpecial = (h630Stock > 0 && h630Show === 0 && !name.includes('毯')); matchShopStock = matchShopShow = matchYangmei = true; }
-else if (specialFilter === 'clearance') { passSpecial = (statusRaw.toUpperCase() === 'D' && (h630Stock > 0 || h630Show > 0)); matchShopStock = matchShopShow = matchYangmei = true; }
-else if (specialFilter === 'display_recommend') { passSpecial = (ymStock > 0 && h630Show === 0); matchShopStock = matchShopShow = matchYangmei = true; }
-else if (specialFilter === 'photo_missing') { passSpecial = (h630Show > 0 && !hasPhoto); matchShopStock = matchShopShow = matchYangmei = true; }
+if (specialFilter === 'negative') { passSpecial = (h630Stock < 0 || h630Show < 0); matchShopStock = matchShopShow = matchYangmei = matchPhoto = true; }
+else if (specialFilter === 'stock_no_show') { passSpecial = (h630Stock > 0 && h630Show === 0 && !name.includes('毯')); matchShopStock = matchShopShow = matchYangmei = matchPhoto = true; }
+else if (specialFilter === 'clearance') { passSpecial = (statusRaw.toUpperCase() === 'D' && (h630Stock > 0 || h630Show > 0)); matchShopStock = matchShopShow = matchYangmei = matchPhoto = true; }
+else if (specialFilter === 'display_recommend') { passSpecial = (ymStock > 0 && h630Show === 0); matchShopStock = matchShopShow = matchYangmei = matchPhoto = true; }
+else if (specialFilter === 'photo_missing') { passSpecial = (h630Show > 0 && !hasPhoto); matchShopStock = matchShopShow = matchYangmei = matchPhoto = true; }
 
-return matchText && matchYangmei && matchShopStock && matchShopShow && passSpecial;
+return matchText && matchYangmei && matchShopStock && matchShopShow && matchPhoto && passSpecial;
 });
 
-document.getElementById('dataCount').innerText = query || onlyYangmei || onlyShopStock || onlyShopShow || specialFilter
+document.getElementById('dataCount').innerText = query || onlyYangmei || onlyShopStock || onlyShopShow || onlyWithPhoto || specialFilter
 ? `過濾結果：${currentFiltered.length} 筆`
 : `共載入 ${products.length} 筆商品資料`;
 renderLimit = 100; renderProducts();
@@ -644,6 +647,7 @@ document.getElementById('searchInput').addEventListener('input', filterAndRender
 document.getElementById('stockFilter').addEventListener('change', filterAndRender);
 document.getElementById('shopStockFilter').addEventListener('change', filterAndRender);
 document.getElementById('shopShowFilter').addEventListener('change', filterAndRender);
+document.getElementById('photoOnlyFilter').addEventListener('change', filterAndRender);
 
 function showQR(sku) { document.getElementById('modalTitle').innerText = `${sku}`; document.getElementById('qrImage').src = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https://www.hola.com.tw/p/${sku}`; document.getElementById('qrModal').style.display = 'flex'; }
 function closeModal() { document.getElementById('qrModal').style.display = 'none'; }
