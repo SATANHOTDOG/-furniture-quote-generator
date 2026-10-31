@@ -10,7 +10,7 @@
 <script src="https://unpkg.com/html5-qrcode"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<!-- 🔥 新增 SweetAlert2 華麗彈跳視窗套件 -->
+<!-- 🔥 SweetAlert2 華麗彈跳視窗套件 -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <style>
@@ -199,7 +199,7 @@ h1 { font-size: 1.5rem; color: var(--primary-color); margin-bottom: 5px; }
 </div>
 </div>
 
-<!-- 🔥 預盤神器 Modal (單人極速版) -->
+<!-- 🔥 預盤神器 Modal -->
 <div id="invModal" class="modal">
 <div class="modal-content" onclick="event.stopPropagation()" style="max-height: 90vh; overflow-y: auto;">
 <span onclick="closeInventoryWizard()" style="position: absolute; right: 15px; top: 15px; font-size: 1.5rem; color: #95a5a6; cursor: pointer;">&times;</span>
@@ -288,6 +288,8 @@ h1 { font-size: 1.5rem; color: var(--primary-color); margin-bottom: 5px; }
 <button class="btn btn-secondary" style="flex: 0 0 60px;" onclick="toggleQuoteApp()">返回</button>
 <button class="btn btn-secondary" style="flex: 0 0 60px; background: #95a5a6; color: white;" onclick="clearQuote()">清空</button>
 <button class="btn btn-primary" style="flex: 1; background: #27ae60;" onclick="saveToCRM()" id="btnSaveCRM">💾 存檔</button>
+<!-- 🔥 新增的 LINE 複製按鈕 -->
+<button class="btn btn-primary" style="flex: 0 0 60px; background: #00B900;" onclick="copyLineQuote()">LINE</button>
 <button class="btn btn-primary" style="flex: 0 0 60px; background: #8e44ad;" onclick="exportPDF()">PDF</button>
 <button class="btn btn-primary" style="flex: 0 0 60px; background: #e74c3c;" onclick="generateQuoteImage()">圖片</button>
 </div>
@@ -359,7 +361,7 @@ h1 { font-size: 1.5rem; color: var(--primary-color); margin-bottom: 5px; }
 </div>
 
 <script>
-// --- 業務百寶箱工具清單 (未來新增網址請在此陣列加入) ---
+// --- 業務百寶箱工具清單 ---
 const myTools = [
 { name: "工具箱", url: "https://satanhotdog.github.io/tool/", icon: "🧰" },
 { name: "家具庫存查詢<br>(大墩版)", url: "https://satanhotdog.github.io/HOLA-INVENTORY/", icon: "📦" },
@@ -641,6 +643,12 @@ const photoBtnHtml = hasPhoto
 ? `<a href="https://satanhotdog.github.io/hola-furniture-search/?q=${sku}" target="_blank" class="btn btn-img">圖片</a>`
 : `<button class="btn btn-secondary" style="opacity: 0.6; cursor: not-allowed; background: #e0e0e0; color: #999;" disabled>📸 缺照片</button>`;
 
+// 🔥 新增：官網連結狀態判斷 (讀取 R 欄)
+const webStatus = getVal(p, '官網狀態') || '';
+const officialWebBtnHtml = (webStatus === '正常')
+? `<a href="https://www.hola.com.tw/p/${sku}" target="_blank" class="btn btn-primary">官網</a>`
+: `<button class="btn btn-secondary" style="opacity: 0.6; cursor: not-allowed; background: #bdc3c7; color: #7f8c8d;" disabled>🚫 官網無資料</button>`;
+
 const card = document.createElement('div');
 card.className = 'card';
 card.innerHTML = `
@@ -661,7 +669,7 @@ ${promoPeriod ? `<div class="promo-period">⏱️ 最終檔期: ${promoPeriod}</
 </div>
 <div style="margin-top: 12px;">
 <div class="action-btns">
-<a href="https://www.hola.com.tw/p/${sku}" target="_blank" class="btn btn-primary">官網</a>
+${officialWebBtnHtml}
 ${photoBtnHtml}
 </div>
 <div class="action-btns-bottom">
@@ -812,6 +820,60 @@ function calculateQuoteTotal() {
 const itemsTotal = quoteCart.reduce((sum, item) => sum + (item.price * item.qty), 0);
 const discountVal = parseInt(document.getElementById('discountInput').value) || 0;
 document.getElementById('quoteGrandTotal').innerText = `$${Math.max(0, itemsTotal - discountVal).toLocaleString()}`;
+}
+
+// 🔥 新增：LINE 純文字一鍵報價功能
+function copyLineQuote() {
+if (quoteCart.length === 0) {
+Swal.fire('空空如也', '購物車沒東西，是要傳空氣給客人嗎？', 'warning');
+return;
+}
+
+let text = `【HOLA 大墩店 專屬報價】\n您好，為您整理今日看中的商品：\n\n`;
+quoteCart.forEach((item, index) => {
+text += `${index + 1}. ${item.name}\n SKU: ${item.sku}\n ${item.qty}件 x $${item.price.toLocaleString()} = $${(item.qty * item.price).toLocaleString()}\n`;
+if (item.note) text += ` (備註: ${item.note})\n`;
+});
+
+const itemsTotal = quoteCart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+const discountVal = parseInt(document.getElementById('discountInput').value) || 0;
+const finalTotal = Math.max(0, itemsTotal - discountVal);
+
+const extraFeeVal = parseInt(document.getElementById('extraFeeInput').value) || 0;
+const extraFeeNote = document.getElementById('extraFeeNote').value.trim();
+
+text += `-------------------\n`;
+text += `商品小計：$${itemsTotal.toLocaleString()}\n`;
+if (discountVal > 0) text += `🎊 預計折扣：-$${discountVal.toLocaleString()}\n`;
+if (extraFeeVal > 0 || extraFeeNote) {
+text += `\n[相關費用提示]\n`;
+if (extraFeeVal > 0) text += `預估費用：$${extraFeeVal.toLocaleString()}\n`;
+if (extraFeeNote) text += `費用說明：${extraFeeNote}\n`;
+}
+text += `\n👑 總金額：$${finalTotal.toLocaleString()}\n`;
+text += `(※總金額不含運費/登高等相關費用)\n\n`;
+text += `此報價僅供初步參考，實際結帳價格以當下門市活動與系統定價為準。`;
+
+// 寫入剪貼簿
+navigator.clipboard.writeText(text).then(() => {
+Swal.fire({
+icon: 'success',
+title: '複製成功！',
+text: '已經將 LINE 純文字報價存入剪貼簿，直接去 LINE 貼上即可。',
+timer: 2000,
+showConfirmButton: false
+});
+}).catch(err => {
+// 若舊版瀏覽器阻擋剪貼簿，提供手動複製的視窗
+Swal.fire({
+title: '請長按下方文字複製',
+input: 'textarea',
+inputValue: text,
+inputAttributes: { rows: 15 },
+showConfirmButton: true,
+confirmButtonText: '關閉'
+});
+});
 }
 
 function saveToCRM() {
