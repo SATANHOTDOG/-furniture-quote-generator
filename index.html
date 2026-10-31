@@ -49,12 +49,12 @@ h1 { font-size: 1.5rem; color: var(--primary-color); margin-bottom: 5px; }
 .pog-active { color: #fff; background: #e74c3c; animation: pogBlink 1.5s infinite; }
 @keyframes pogBlink { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
 .action-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 6px; }
-.action-btns-bottom { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
 .btn { flex: 1; text-align: center; padding: 10px 0; border-radius: 6px; font-size: 0.9rem; font-weight: bold; cursor: pointer; border: none; text-decoration: none; box-sizing: border-box; }
 .btn-primary { background: var(--primary-color); color: #ffffff; }
 .btn-img { background: #f39c12; color: #ffffff; }
 .btn-secondary { background: #e2e8f0; color: #334155; }
 .btn-quote { background: #27ae60; color: #ffffff; }
+.btn-promo-sch { background: #8e44ad; color: #ffffff; } /* 新增特價檔期按鈕樣式 */
 .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.75); justify-content: center; align-items: center; z-index: 1000; }
 .modal-content { background: #fff; padding: 25px; border-radius: 16px; text-align: center; width: 90%; max-width: 420px; position: relative; }
 .loader { text-align: center; padding: 50px; font-size: 1.2rem; color: var(--text-muted); }
@@ -288,7 +288,6 @@ h1 { font-size: 1.5rem; color: var(--primary-color); margin-bottom: 5px; }
 <button class="btn btn-secondary" style="flex: 0 0 60px;" onclick="toggleQuoteApp()">返回</button>
 <button class="btn btn-secondary" style="flex: 0 0 60px; background: #95a5a6; color: white;" onclick="clearQuote()">清空</button>
 <button class="btn btn-primary" style="flex: 1; background: #27ae60;" onclick="saveToCRM()" id="btnSaveCRM">💾 存檔</button>
-<!-- 🔥 新增的 LINE 複製按鈕 -->
 <button class="btn btn-primary" style="flex: 0 0 60px; background: #00B900;" onclick="copyLineQuote()">LINE</button>
 <button class="btn btn-primary" style="flex: 0 0 60px; background: #8e44ad;" onclick="exportPDF()">PDF</button>
 <button class="btn btn-primary" style="flex: 0 0 60px; background: #e74c3c;" onclick="generateQuoteImage()">圖片</button>
@@ -643,7 +642,7 @@ const photoBtnHtml = hasPhoto
 ? `<a href="https://satanhotdog.github.io/hola-furniture-search/?q=${sku}" target="_blank" class="btn btn-img">圖片</a>`
 : `<button class="btn btn-secondary" style="opacity: 0.6; cursor: not-allowed; background: #e0e0e0; color: #999;" disabled>📸 缺照片</button>`;
 
-// 🔥 新增：官網連結狀態判斷 (讀取 R 欄)
+// 官網連結狀態判斷 (讀取 R 欄)
 const webStatus = getVal(p, '官網狀態') || '';
 const officialWebBtnHtml = (webStatus === '正常')
 ? `<a href="https://www.hola.com.tw/p/${sku}" target="_blank" class="btn btn-primary">官網</a>`
@@ -672,10 +671,12 @@ ${promoPeriod ? `<div class="promo-period">⏱️ 最終檔期: ${promoPeriod}</
 ${officialWebBtnHtml}
 ${photoBtnHtml}
 </div>
-<div class="action-btns-bottom">
+<!-- 🔥 將原本的 1x3 改為 2x2 四宮格排列 -->
+<div class="action-btns-bottom" style="grid-template-columns: 1fr 1fr;">
 <button class="btn btn-secondary" onclick="showQR('${sku}')">QR Code</button>
 <button class="btn btn-quote" onclick="addToQuote('${sku}', '${name.replace(/'/g, "\'")}', ${bestPriceForQuote || 0})">➕ 報價</button>
 <button class="btn" style="background: #e67e22; color: white;" onclick="findSitePhoto('${sku}')">🔍 找現場圖</button>
+<button class="btn btn-promo-sch" onclick="showPromoSchedule('${sku}')">📅 檔期總表</button>
 </div>
 </div>
 `;
@@ -698,7 +699,74 @@ function showQR(sku) { document.getElementById('modalTitle').innerText = `${sku}
 function closeModal() { document.getElementById('qrModal').style.display = 'none'; }
 
 // -----------------------------------------------------
-// 🔥 現場圖查詢功能 (SweetAlert2 華麗升級版)
+// 🔥 新增：檔期總表查詢功能
+// -----------------------------------------------------
+function showPromoSchedule(sku) {
+  const p = productsMap[sku];
+  if (!p) return;
+
+  let rawPromoPrice = getVal(p, '促銷售價');
+  if (rawPromoPrice === '#N/A' || rawPromoPrice === '0') rawPromoPrice = '';
+  let rawPromoPeriod = getVal(p, '促銷期間');
+  if (rawPromoPeriod === '#N/A') rawPromoPeriod = '';
+  const origPrice = getVal(p, '一般售價') || '0';
+
+  // 如果根本沒有特價資料
+  if (!rawPromoPrice || !rawPromoPeriod) {
+    Swal.fire({
+      icon: 'info',
+      title: '無特價紀錄',
+      text: `目前系統中沒有 ${sku} 的促銷檔期資料，將維持一般售價 $${origPrice}。`,
+      confirmButtonColor: '#2c3e50'
+    });
+    return;
+  }
+
+  const prices = rawPromoPrice.split('|').map(s => s.trim());
+  const periods = rawPromoPeriod.split('|').map(s => s.trim());
+  
+  let htmlContent = `<div style="text-align: left; font-size: 0.95rem; line-height: 1.6;">`;
+  htmlContent += `<div style="margin-bottom: 12px; font-weight: bold; color: #34495e; font-size: 1.1rem; border-bottom: 2px solid #ecf0f1; padding-bottom: 5px;">一般售價：$${origPrice}</div>`;
+  htmlContent += `<ul style="list-style-type: none; padding-left: 0;">`;
+  
+  const now = new Date();
+  
+  for (let i = 0; i < periods.length; i++) {
+    const priceMatch = prices[i] !== undefined ? prices[i] : prices[0];
+    const periodStr = periods[i] || '未知期間';
+    
+    // 判斷該檔期是否正是「現在」
+    let isActive = false;
+    const parts = periodStr.split('~');
+    if (parts.length === 2) {
+      const start = new Date(parts[0].trim().replace(/-/g, '/') + " 00:00:00");
+      const end = new Date(parts[1].trim().replace(/-/g, '/') + " 23:59:59");
+      if (now >= start && now <= end) isActive = true;
+    }
+
+    const activeStyle = isActive ? `background: #e8f8f5; border-left: 4px solid #1abc9c; border-radius: 4px;` : `border-bottom: 1px dashed #bdc3c7;`;
+    const activeBadge = isActive ? `<span style="color: #e74c3c; font-size: 0.8rem; margin-left: 8px; font-weight: 900;">(🔥 當前生效)</span>` : '';
+    const dateColor = isActive ? `#16a085` : `#7f8c8d`;
+    const priceColor = isActive ? `#e74c3c` : `#2c3e50`;
+
+    htmlContent += `<li style="padding: 10px; margin-bottom: 8px; ${activeStyle}">
+      <div style="color: ${dateColor}; font-size: 0.85rem; font-weight: bold;">🗓️ ${periodStr}</div>
+      <div style="color: ${priceColor}; font-size: 1.1rem; font-weight: bold; margin-top: 4px;">💰 特價 $${priceMatch} ${activeBadge}</div>
+    </li>`;
+  }
+  htmlContent += `</ul></div>`;
+
+  Swal.fire({
+    title: `歷史與未來檔期表<br><span style="font-size: 0.9rem; color: #7f8c8d; font-family: monospace;">SKU: ${sku}</span>`,
+    html: htmlContent,
+    confirmButtonText: '關閉',
+    confirmButtonColor: '#2c3e50',
+    width: '400px'
+  });
+}
+
+// -----------------------------------------------------
+// 現場圖查詢功能
 // -----------------------------------------------------
 function findSitePhoto(sku) {
 if (!sku) {
@@ -822,7 +890,7 @@ const discountVal = parseInt(document.getElementById('discountInput').value) || 
 document.getElementById('quoteGrandTotal').innerText = `$${Math.max(0, itemsTotal - discountVal).toLocaleString()}`;
 }
 
-// 🔥 新增：LINE 純文字一鍵報價功能
+// LINE 純文字一鍵報價功能
 function copyLineQuote() {
 if (quoteCart.length === 0) {
 Swal.fire('空空如也', '購物車沒東西，是要傳空氣給客人嗎？', 'warning');
@@ -854,7 +922,6 @@ text += `\n👑 總金額：$${finalTotal.toLocaleString()}\n`;
 text += `(※總金額不含運費/登高等相關費用)\n\n`;
 text += `此報價僅供初步參考，實際結帳價格以當下門市活動與系統定價為準。`;
 
-// 寫入剪貼簿
 navigator.clipboard.writeText(text).then(() => {
 Swal.fire({
 icon: 'success',
@@ -864,7 +931,6 @@ timer: 2000,
 showConfirmButton: false
 });
 }).catch(err => {
-// 若舊版瀏覽器阻擋剪貼簿，提供手動複製的視窗
 Swal.fire({
 title: '請長按下方文字複製',
 input: 'textarea',
