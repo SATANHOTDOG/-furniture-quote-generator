@@ -10,7 +10,7 @@
 <script src="https://unpkg.com/html5-qrcode"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<!-- 🔥 SweetAlert2 華麗彈跳視窗套件 -->
+<!-- SweetAlert2 華麗彈跳視窗套件 -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <style>
@@ -48,13 +48,17 @@ h1 { font-size: 1.5rem; color: var(--primary-color); margin-bottom: 5px; }
 .pog-none { color: #7f8c8d; background: #eef2f7; }
 .pog-active { color: #fff; background: #e74c3c; animation: pogBlink 1.5s infinite; }
 @keyframes pogBlink { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+
+/* 按鈕區塊佈局設定 */
 .action-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 6px; }
+.action-btns-bottom { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; } /* 🔥 強制改為 2x2 雙排佈局 */
+
 .btn { flex: 1; text-align: center; padding: 10px 0; border-radius: 6px; font-size: 0.9rem; font-weight: bold; cursor: pointer; border: none; text-decoration: none; box-sizing: border-box; }
 .btn-primary { background: var(--primary-color); color: #ffffff; }
 .btn-img { background: #f39c12; color: #ffffff; }
 .btn-secondary { background: #e2e8f0; color: #334155; }
 .btn-quote { background: #27ae60; color: #ffffff; }
-.btn-promo-sch { background: #8e44ad; color: #ffffff; } /* 新增特價檔期按鈕樣式 */
+.btn-promo-sch { background: #8e44ad; color: #ffffff; }
 .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.75); justify-content: center; align-items: center; z-index: 1000; }
 .modal-content { background: #fff; padding: 25px; border-radius: 16px; text-align: center; width: 90%; max-width: 420px; position: relative; }
 .loader { text-align: center; padding: 50px; font-size: 1.2rem; color: var(--text-muted); }
@@ -199,7 +203,7 @@ h1 { font-size: 1.5rem; color: var(--primary-color); margin-bottom: 5px; }
 </div>
 </div>
 
-<!-- 🔥 預盤神器 Modal -->
+<!-- 預盤神器 Modal -->
 <div id="invModal" class="modal">
 <div class="modal-content" onclick="event.stopPropagation()" style="max-height: 90vh; overflow-y: auto;">
 <span onclick="closeInventoryWizard()" style="position: absolute; right: 15px; top: 15px; font-size: 1.5rem; color: #95a5a6; cursor: pointer;">&times;</span>
@@ -360,7 +364,7 @@ h1 { font-size: 1.5rem; color: var(--primary-color); margin-bottom: 5px; }
 </div>
 
 <script>
-// --- 業務百寶箱工具清單 ---
+// 業務百寶箱工具清單
 const myTools = [
 { name: "工具箱", url: "https://satanhotdog.github.io/tool/", icon: "🧰" },
 { name: "家具庫存查詢<br>(大墩版)", url: "https://satanhotdog.github.io/HOLA-INVENTORY/", icon: "📦" },
@@ -384,7 +388,7 @@ container.appendChild(a);
 document.getElementById('toolboxModal').style.display = 'flex';
 }
 
-// --- 靜態 API 與 CSV 網址 ---
+// 靜態 API 與 CSV 網址
 const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxrhh56MPO5Kw1kC3Ji66y3181amvj22KFRFhpz7lBDxKnZl0myQcuZxw0jzsPckIdILg/exec';
 const GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTC18jsseZH3TerLqZMzzkJc1uPjh2IVTktcs4DxiuEmpA_NRAnzKrgzZbV43FQtN8b7-vMlvv1BFGF/pub?gid=0&single=true&output=csv';
 const INVENTORY_API_URL = 'https://script.google.com/macros/s/AKfycbwwURYlCZGLJqtQLD7gq8f5vOd3X2rtrCpQYySxxmCMpSvLOj9p65qrtAdcdS_AAO2U4w/exec';
@@ -671,8 +675,8 @@ ${promoPeriod ? `<div class="promo-period">⏱️ 最終檔期: ${promoPeriod}</
 ${officialWebBtnHtml}
 ${photoBtnHtml}
 </div>
-<!-- 🔥 將原本的 1x3 改為 2x2 四宮格排列 -->
-<div class="action-btns-bottom" style="grid-template-columns: 1fr 1fr;">
+<!-- 🔥 強制 2x2 四宮格排列 -->
+<div class="action-btns-bottom">
 <button class="btn btn-secondary" onclick="showQR('${sku}')">QR Code</button>
 <button class="btn btn-quote" onclick="addToQuote('${sku}', '${name.replace(/'/g, "\'")}', ${bestPriceForQuote || 0})">➕ 報價</button>
 <button class="btn" style="background: #e67e22; color: white;" onclick="findSitePhoto('${sku}')">🔍 找現場圖</button>
@@ -699,7 +703,7 @@ function showQR(sku) { document.getElementById('modalTitle').innerText = `${sku}
 function closeModal() { document.getElementById('qrModal').style.display = 'none'; }
 
 // -----------------------------------------------------
-// 🔥 新增：檔期總表查詢功能
+// 檔期總表查詢功能
 // -----------------------------------------------------
 function showPromoSchedule(sku) {
   const p = productsMap[sku];
@@ -711,7 +715,6 @@ function showPromoSchedule(sku) {
   if (rawPromoPeriod === '#N/A') rawPromoPeriod = '';
   const origPrice = getVal(p, '一般售價') || '0';
 
-  // 如果根本沒有特價資料
   if (!rawPromoPrice || !rawPromoPeriod) {
     Swal.fire({
       icon: 'info',
@@ -735,7 +738,6 @@ function showPromoSchedule(sku) {
     const priceMatch = prices[i] !== undefined ? prices[i] : prices[0];
     const periodStr = periods[i] || '未知期間';
     
-    // 判斷該檔期是否正是「現在」
     let isActive = false;
     const parts = periodStr.split('~');
     if (parts.length === 2) {
@@ -998,9 +1000,9 @@ pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight); pdf.save(`HOLA大墩�
 }
 
 // ==========================================
-// 🔥 預盤神器模組 (含尋寶圖相機) 單人極速版
+// 預盤神器模組 (含尋寶圖相機) 單人極速版
 // ==========================================
-let invConfig = { cabinet: '', user: 'A' }; // 固定為 A 員
+let invConfig = { cabinet: '', user: 'A' };
 let currentInvItem = { sku: '', name: '', photoBase64: '' };
 
 function openInventoryWizard() {
@@ -1011,7 +1013,6 @@ else { switchInvSection('invSetupSection'); document.getElementById('invHeaderSt
 function closeInventoryWizard() { document.getElementById('invModal').style.display = 'none'; }
 function switchInvSection(secId) { document.getElementById('invSetupSection').classList.remove('active-section'); document.getElementById('invScanSection').classList.remove('active-section'); document.getElementById('invFormSection').classList.remove('active-section'); document.getElementById(secId).classList.add('active-section'); }
 
-// --- 動作一：產生雲端對帳總表 (單人精簡) ---
 function initInventorySummary() {
 const cab = document.getElementById('invCabinet').value.trim();
 if (!cab) return alert("請先輸入盤點櫃號！");
@@ -1085,7 +1086,6 @@ reader.readAsDataURL(file); event.target.value = '';
 function adjQty(delta) { let val = (parseInt(document.getElementById('invQty').value) || 1) + delta; document.getElementById('invQty').value = val < 1 ? 1 : val; }
 function backToScan() { switchInvSection('invScanSection'); }
 
-// --- 動作二：上傳盤點資料 ---
 function submitInventoryData() {
 const btn = document.getElementById('btnSubmitInv'); btn.disabled = true; btn.innerText = currentInvItem.photoBase64 ? '照片上傳中...' : '上傳中...';
 const payload = {
@@ -1102,7 +1102,6 @@ fetch(INVENTORY_API_URL, { method: 'POST', body: JSON.stringify(payload), header
 
 function showToast() { const toast = document.getElementById("toast"); toast.className = "toast show"; setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 3000); }
 
-// 神器相機
 const html5QrCodeInv = new Html5Qrcode("hiddenReader");
 document.getElementById('invQrInput').addEventListener('change', event => {
 if (event.target.files.length == 0) return;
@@ -1115,7 +1114,6 @@ if (targetSku) processScannedSku(targetSku); else alert("解碼失敗：" + deco
 }).catch(() => { document.getElementById('invScanStatus').style.display = 'none'; alert("照片解析失敗，請重拍或輸入 SKU"); }).finally(() => { event.target.value = ''; });
 });
 
-// 大廳相機
 const html5QrCode = new Html5Qrcode("hiddenReader");
 document.getElementById('cameraBtn').addEventListener('click', () => { document.getElementById('qrInput').click(); });
 document.getElementById('qrInput').addEventListener('change', event => {
