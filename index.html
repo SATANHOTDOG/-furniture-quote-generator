@@ -158,6 +158,9 @@ h1 { font-size: 1.5rem; color: var(--primary-color); margin-bottom: 5px; }
 </div>
 <button id="cameraBtn" class="btn btn-secondary" style="width: 100%; margin-top: 15px; margin-bottom: 5px; font-weight: bold; background: #2980b9; color: white; padding: 12px;">📸 喚醒原生相機拍照掃描</button>
 <input type="file" id="qrInput" accept="image/" capture="environment" style="display: none;">
+<!-- 🔥 新增：供掃雷器使用的隱藏拍照輸入框 -->
+<input type="file" id="msPhotoInput" accept="image/" capture="environment" style="display: none;">
+
 <div id="hiddenReader" style="display: none;"></div>
 <div id="scanStatus" style="text-align: center; color: var(--accent-color); font-size: 0.9rem; margin-top: 5px; display: none;">🔍 正在解析照片...</div>
 </div>
@@ -194,8 +197,8 @@ h1 { font-size: 1.5rem; color: var(--primary-color); margin-bottom: 5px; }
 <h4 style="color: #2980b9;">📅 特定日期換檔查詢與驗收</h4>
 <input type="date" id="wizardDate" style="width: 100%; padding: 8px; margin-bottom: 10px; border: 1px solid #bdc3c7; border-radius: 6px;">
 <button class="btn" style="width: 100%; background: #2c3e50; color: white;" onclick="runWizardSpecific()">🔍 查詢此日變化 (匯出表格)</button>
-<!-- 🔥 新增：掃雷器啟動入口 -->
-<button class="btn" style="width: 100%; background: #e67e22; color: white; margin-top: 8px;" onclick="startMineSweeper()">📸 啟動查價掃雷器 (鏡頭連掃)</button>
+<!-- 🔥 改為：拍照版掃雷器啟動入口 -->
+<button class="btn" style="width: 100%; background: #e67e22; color: white; margin-top: 8px;" onclick="startMineSweeper()">📸 啟動查價掃雷器 (拍照版)</button>
 
 <div id="wizardSpecificResult" style="display: none; margin-top: 15px;">
 <button class="btn" style="width: 100%; background: #e74c3c; color: white; margin-bottom: 8px;" id="btnDropSpec" onclick="exportSpecific('drop')">📥 匯出【進入特價】 (0)</button>
@@ -204,18 +207,6 @@ h1 { font-size: 1.5rem; color: var(--primary-color); margin-bottom: 5px; }
 </div>
 <button class="btn btn-secondary" style="width: 100%;" onclick="document.getElementById('wizardModal').style.display='none'">關閉視窗</button>
 </div>
-</div>
-
-<!-- 🔥 新增：查價掃雷器 (即時鏡頭) Overlay -->
-<div id="mineSweeperOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 3500; flex-direction: column;">
-    <div style="padding: 15px; background: #2c3e50; color: white; display: flex; justify-content: space-between; align-items: center;">
-        <div style="font-weight: bold; font-size: 1.1rem; color: #f1c40f;">🎯 查價掃雷器 (<span id="msDateDisplay"></span>)</div>
-        <button onclick="stopMineSweeper()" style="background: #e74c3c; color: white; border: none; padding: 6px 15px; border-radius: 6px; font-weight: bold;">關閉</button>
-    </div>
-    <div id="msReader" style="width: 100%; flex: 1; display: flex; justify-content: center; align-items: center; background: #111;"></div>
-    <div id="msResult" style="padding: 15px; background: #fff; min-height: 150px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; box-shadow: 0 -4px 15px rgba(0,0,0,0.1);">
-        <div style="color: #7f8c8d; font-weight: bold;">掃描準備就緒，請對準商品 QR Code 或條碼...</div>
-    </div>
 </div>
 
 <!-- 預盤神器 Modal -->
@@ -1016,11 +1007,10 @@ pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight); pdf.save(`HOLA大墩�
 }
 
 // ==========================================
-// 🔥 新增：查價掃雷器 (機關槍連掃)
+// 🔥 查價掃雷器 (精準拍照連發版)
 // ==========================================
-let msHtml5QrCode = null;
 let msTargetDate = null;
-let lastScannedCode = '';
+const msHtml5QrCode = new Html5Qrcode("hiddenReader"); 
 
 function startMineSweeper() {
     const dateInput = document.getElementById('wizardDate').value;
@@ -1028,89 +1018,96 @@ function startMineSweeper() {
     
     const safeDateStr = dateInput.replace(/-/g, '/');
     msTargetDate = new Date(safeDateStr + " 12:00:00");
-    document.getElementById('msDateDisplay').innerText = dateInput;
     
-    // 關閉換檔精靈，開啟掃雷器
+    // 關閉換檔精靈 Modal
     document.getElementById('wizardModal').style.display = 'none';
-    document.getElementById('mineSweeperOverlay').style.display = 'flex';
-    document.getElementById('msResult').innerHTML = '<div style="color: #7f8c8d; font-weight: bold;">掃描準備就緒，請對準商品 QR Code 或條碼...</div>';
-    lastScannedCode = '';
     
-    if (!msHtml5QrCode) {
-        msHtml5QrCode = new Html5Qrcode("msReader");
-    }
+    // 直接呼叫手機相機
+    document.getElementById('msPhotoInput').click();
+}
+
+document.getElementById('msPhotoInput').addEventListener('change', event => {
+    if (event.target.files.length === 0) return;
+    const file = event.target.files[0];
     
-    msHtml5QrCode.start(
-        { facingMode: "environment" },
-        { fps: 10, qrbox: { width: 250, height: 250 } },
-        (decodedText, decodedResult) => {
-            // 防連掃機制：2 秒內不重複處理同一個條碼
-            if (decodedText !== lastScannedCode) {
-                lastScannedCode = decodedText;
-                processMineSweeperScan(decodedText);
-                setTimeout(() => { if(lastScannedCode === decodedText) lastScannedCode = ''; }, 2000);
-            }
-        },
-        (errorMessage) => {
-            // 忽略未掃到條碼時的持續報錯
-        }
-    ).catch(err => {
-        alert("無法啟動相機，請確認是否有授權網頁存取相機權限！");
-        stopMineSweeper();
+    Swal.fire({
+        title: '掃雷解析中...',
+        text: '正在讀取條碼',
+        allowOutsideClick: false,
+        didOpen: () => { Swal.showLoading(); }
     });
-}
-
-function stopMineSweeper() {
-    if (msHtml5QrCode && msHtml5QrCode.isScanning) {
-        msHtml5QrCode.stop().then(() => {
-            document.getElementById('mineSweeperOverlay').style.display = 'none';
-        }).catch(err => {
-            document.getElementById('mineSweeperOverlay').style.display = 'none';
+    
+    msHtml5QrCode.scanFile(file, true).then(decodedText => {
+        let targetSku = null;
+        const pMatch = decodedText.match(/\/p\/(0\d{8})/i); 
+        const blindMatch = decodedText.match(/(0\d{8})(?=\D|$)/);
+        targetSku = pMatch ? pMatch[1] : (blindMatch ? blindMatch[1] : null);
+        
+        if (!targetSku) {
+            showMsError("無法辨識此條碼", decodedText);
+            return;
+        }
+        
+        const p = productsMap[targetSku];
+        if (!p) {
+            showMsError("查無此商品", `SKU: ${targetSku}`);
+            return;
+        }
+        
+        const name = getVal(p, '商品名稱');
+        const targetPrice = getRawPriceOnDate(p, msTargetDate);
+        const origPrice = parseInt(getVal(p, '一般售價').replace(/,/g, '')) || 0;
+        
+        let statusText = '';
+        let statusColor = '';
+        if (targetPrice < origPrice) {
+            statusText = '🔥 特價';
+            statusColor = '#e74c3c'; 
+        } else {
+            statusText = '🛑 原價';
+            statusColor = '#2c3e50'; 
+        }
+        
+        try { navigator.vibrate && navigator.vibrate(100); } catch(e){}
+        
+        Swal.fire({
+            title: `<div style="font-size: 1.1rem; color: #2c3e50;">${name}</div>`,
+            html: `
+                <div style="font-size: 0.9rem; color: #7f8c8d; margin-bottom: 10px;">SKU: ${targetSku}</div>
+                <div style="font-size: 1.8rem; font-weight: 900; color: ${statusColor}; background: #f8f9fa; padding: 15px; border-radius: 8px; border: 2px dashed ${statusColor};">應為: ${statusText} $${targetPrice.toLocaleString()}</div>
+            `,
+            confirmButtonText: '📸 繼續掃下一個',
+            confirmButtonColor: '#e67e22',
+            showCancelButton: true,
+            cancelButtonText: '結束掃雷',
+            cancelButtonColor: '#bdc3c7'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('msPhotoInput').click();
+            }
         });
-    } else {
-        document.getElementById('mineSweeperOverlay').style.display = 'none';
-    }
-}
 
-function processMineSweeperScan(text) {
-    const pMatch = text.match(/\/p\/(0\d{8})/i); 
-    const blindMatch = text.match(/(0\d{8})(?=\D|$)/);
-    let targetSku = pMatch ? pMatch[1] : (blindMatch ? blindMatch[1] : null);
-    
-    const resDiv = document.getElementById('msResult');
-    
-    if (!targetSku) {
-        resDiv.innerHTML = `<div style="color: #e74c3c; font-weight: bold; font-size: 1.2rem;">❌ 無法辨識此條碼</div><div style="font-size: 0.8rem; color:#7f8c8d; margin-top:5px;">${text}</div>`;
-        return;
-    }
-    
-    const p = productsMap[targetSku];
-    if (!p) {
-        resDiv.innerHTML = `<div style="color: #e74c3c; font-weight: bold; font-size: 1.2rem;">❌ 查無此商品 (SKU: ${targetSku})</div>`;
-        return;
-    }
-    
-    const name = getVal(p, '商品名稱');
-    const targetPrice = getRawPriceOnDate(p, msTargetDate);
-    const origPrice = parseInt(getVal(p, '一般售價').replace(/,/g, '')) || 0;
-    
-    let statusText = '';
-    let statusColor = '';
-    if (targetPrice < origPrice) {
-        statusText = '🔥 特價';
-        statusColor = '#e74c3c'; // 紅字
-    } else {
-        statusText = '🛑 原價';
-        statusColor = '#2c3e50'; // 深藍字
-    }
-    
-    try { navigator.vibrate && navigator.vibrate(100); } catch(e){}
-    
-    resDiv.innerHTML = `
-        <div style="font-size: 0.9rem; color: #7f8c8d; margin-bottom: 5px;">SKU: ${targetSku}</div>
-        <div style="font-size: 1.1rem; font-weight: 900; color: #2c3e50; margin-bottom: 8px;">${name}</div>
-        <div style="font-size: 1.6rem; font-weight: 900; color: ${statusColor};">應為: ${statusText} $${targetPrice.toLocaleString()}</div>
-    `;
+    }).catch(err => {
+        showMsError("照片解析失敗", "請確保條碼清晰且無反光");
+    }).finally(() => {
+        event.target.value = ''; // 重置 file input，確保同一張照片也能觸發 change 事件
+    });
+});
+
+function showMsError(title, text) {
+    Swal.fire({
+        icon: 'error',
+        title: title,
+        text: text,
+        confirmButtonText: '📸 重試一次',
+        confirmButtonColor: '#e67e22',
+        showCancelButton: true,
+        cancelButtonText: '結束'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            document.getElementById('msPhotoInput').click();
+        }
+    });
 }
 
 // ==========================================
