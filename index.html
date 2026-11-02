@@ -802,7 +802,7 @@ function generateBlindBox(sku) {
     const encoded = btoa(encodeURIComponent(payload)); 
     
     // 你需要把這個換成你實際在 Github 建立的那個盲盒網頁網址
-    const url = `https://satanhotdog.github.io/vip-check.html?c=${encoded}`;
+    const url = `https://satanhotdog.github.io/vip-check/?c=${encoded}`;
     
     navigator.clipboard.writeText(url).then(() => {
         Swal.fire({
