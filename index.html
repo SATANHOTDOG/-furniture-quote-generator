@@ -138,9 +138,9 @@ h1 { font-size: 1.5rem; color: var(--primary-color); margin-bottom: 5px; }
 <div class="filter-bar">
 <div class="checkbox-group">
 <label class="checkbox-container"><input type="checkbox" id="stockFilter">⚡ 楊梅現貨</label>
-<label class="checkbox-container"><input type="checkbox" id="poArrivalFilter">🚢 有PO到貨</label>
 <label class="checkbox-container"><input type="checkbox" id="shopStockFilter">📦 店內庫存</label>
 <label class="checkbox-container"><input type="checkbox" id="shopShowFilter">🛋️ 店內展示</label>
+<label class="checkbox-container"><input type="checkbox" id="poArrivalFilter">🚢 有PO到貨</label>
 <label class="checkbox-container"><input type="checkbox" id="photoOnlyFilter">📸 有照片</label>
 </div>
 <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
@@ -1044,7 +1044,7 @@ html5QrCodeInv.scanFile(file, true).then(decodedText => { document.getElementByI
 const html5QrCode = new Html5Qrcode("hiddenReader");
 document.getElementById('cameraBtn').addEventListener('click', () => { document.getElementById('qrInput').click(); });
 document.getElementById('qrInput').addEventListener('change', event => {
-if (event.target.files.length === 0) return; const file = event.target.files[0]; document.getElementById('scanStatus').style.display = 'block';
+if (event.target.files.length == 0) return; const file = event.target.files[0]; document.getElementById('scanStatus').style.display = 'block';
 html5QrCode.scanFile(file, true).then(decodedText => { document.getElementById('scanStatus').style.display = 'none'; let targetSku = null; const pMatch = decodedText.match(/\/p\/(0\d{8})/i); const blindMatch = decodedText.match(/(0\d{8})(?=\D|$)/); targetSku = pMatch ? pMatch[1] : (blindMatch ? blindMatch[1] : null); if (targetSku) { let searchBox = document.getElementById('searchInput'); searchBox.value = targetSku; searchBox.dispatchEvent(new Event('input')); } else alert("解析失敗"); }).catch(() => { document.getElementById('scanStatus').style.display = 'none'; alert("照片解析失敗。"); }).finally(() => { event.target.value = ''; });
 });
 fetchProducts();
