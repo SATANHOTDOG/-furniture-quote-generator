@@ -30,12 +30,18 @@ h1 { font-size: 1.5rem; color: var(--primary-color); margin-bottom: 5px; }
 .card-header { border-bottom: 1px solid var(--border-color); padding-bottom: 10px; margin-bottom: 10px; }
 .sku-tag { display: inline-block; background: #eef2f7; color: var(--primary-color); font-weight: bold; font-size: 0.85rem; padding: 3px 8px; border-radius: 4px; margin-bottom: 6px; }
 .item-name { font-size: 1.05rem; font-weight: 600; color: #1a252f; line-height: 1.4; }
-.stock-section { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; background: #f1f3f5; padding: 10px; border-radius: 8px; margin-bottom: 12px; text-align: center; }
-.stock-box { display: flex; flex-direction: column; }
-.stock-title { font-size: 0.75rem; color: var(--text-muted); }
+/* 雙排庫存區塊樣式 */
+.stock-wrapper { background: #f1f3f5; padding: 10px; border-radius: 8px; margin-bottom: 12px; }
+.stock-row-top { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; text-align: center; padding-bottom: 8px; border-bottom: 1px dashed #ced4da; }
+.stock-row-bottom { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; text-align: center; padding-top: 8px; }
+.stock-box { display: flex; flex-direction: column; justify-content: center; align-items: center; }
+.stock-title { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 2px; }
 .stock-val { font-size: 1.1rem; font-weight: bold; color: var(--primary-color); }
 .stock-val.has-stock { color: var(--success-color); }
 .stock-val.negative-stock { color: #e74c3c; }
+.stock-val.po-clickable { color: #2980b9; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; background: #e1f0fa; padding: 1px 10px; border-radius: 6px; transition: background 0.15s; }
+.stock-val.po-clickable:hover { background: #cce5f6; }
+.stock-val.sellable-has { color: #16a085; font-weight: 900; }
 .price-section { margin-bottom: 12px; }
 .price-row { display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; margin-bottom: 4px; }
 .price-orig { text-decoration: line-through; color: #95a5a6; }
@@ -132,6 +138,7 @@ h1 { font-size: 1.5rem; color: var(--primary-color); margin-bottom: 5px; }
 <div class="filter-bar">
 <div class="checkbox-group">
 <label class="checkbox-container"><input type="checkbox" id="stockFilter">⚡ 楊梅現貨</label>
+<label class="checkbox-container"><input type="checkbox" id="poArrivalFilter">🚢 有PO到貨</label>
 <label class="checkbox-container"><input type="checkbox" id="shopStockFilter">📦 店內庫存</label>
 <label class="checkbox-container"><input type="checkbox" id="shopShowFilter">🛋️ 店內展示</label>
 <label class="checkbox-container"><input type="checkbox" id="photoOnlyFilter">📸 有照片</label>
@@ -403,11 +410,15 @@ const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxrhh56MPO5Kw1k
 const GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTC18jsseZH3TerLqZMzzkJc1uPjh2IVTktcs4DxiuEmpA_NRAnzKrgzZbV43FQtN8b7-vMlvv1BFGF/pub?gid=0&single=true&output=csv';
 const INVENTORY_API_URL = 'https://script.google.com/macros/s/AKfycbwwURYlCZGLJqtQLD7gq8f5vOd3X2rtrCpQYySxxmCMpSvLOj9p65qrtAdcdS_AAO2U4w/exec';
 const DEMAND_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTC18jsseZH3TerLqZMzzkJc1uPjh2IVTktcs4DxiuEmpA_NRAnzKrgzZbV43FQtN8b7-vMlvv1BFGF/pub?gid=445072275&single=true&output=csv';
+const PO_ARRIVAL_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTC18jsseZH3TerLqZMzzkJc1uPjh2IVTktcs4DxiuEmpA_NRAnzKrgzZbV43FQtN8b7-vMlvv1BFGF/pub?gid=2049273249&single=true&output=csv';
+
 const rawReviewUrl = "https://tinyurl.com/h799vfwx";
 document.getElementById('reviewQrImg').src = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(rawReviewUrl)}`;
 
 function autoExpand(field) { field.style.height = 'inherit'; field.style.height = field.scrollHeight + 'px'; }
 let products = []; let currentFiltered = []; let renderLimit = 100; let quoteCart = []; let isBossMode = false; let productsMap = {};
+let poArrivalMap = {}; // 儲存各 SKU 的 PO 到貨資訊: { "014413112": { total: 64, batches: [ { qty, po, date } ] } }
+let poReportUpdateDate = '未標示'; // 儲存 G2 儲存格的報表更新日期
 document.getElementById('wizardDate').valueAsDate = new Date();
 
 async function fetchProducts() {
@@ -417,8 +428,85 @@ if (lines.length > 0) { headers = parseCSVLine(lines[0]); const updateDate = hea
 products = parseCSVOptimized(lines, headers);
 products.forEach(p => { const sku = getVal(p, 'SKU'); if(sku) productsMap[sku] = p; });
 document.getElementById('loader').style.display = 'none'; document.getElementById('searchInput').disabled = false;
-filterAndRender(); fetchCustomerDemands();
+filterAndRender();
+fetchPoArrivals();
+fetchCustomerDemands();
 } catch (error) { document.getElementById('loader').innerText = '資料載入失敗，請確認網址或試算表狀態。'; }
+}
+
+async function fetchPoArrivals() {
+    try {
+        const response = await fetch(PO_ARRIVAL_CSV_URL);
+        const csvText = await response.text();
+        const lines = csvText.split(/\r?\n/);
+        if (lines.length < 2) return;
+        const headers = parseCSVLine(lines[0]);
+        // 讀取第二列 (index 1) 的 G2 儲存格 (index 6) 作為報表更新日期
+        const secondRowVals = parseCSVLine(lines[1]);
+        if (secondRowVals[6] && secondRowVals[6].trim() !== '') {
+            poReportUpdateDate = secondRowVals[6].trim();
+        }
+        const rows = parseCSVOptimized(lines, headers);
+        const tempMap = {};
+        rows.forEach(r => {
+            const rawSku = getVal(r, 'SKU').trim();
+            if (!rawSku) return;
+            const sku = rawSku.padStart(9, '0');
+            const qty = parseInt(String(getVal(r, '數量') || '0').replace(/,/g, '')) || 0;
+            const po = getVal(r, 'PO').trim() || '未提供';
+            const arrivalDate = getVal(r, '預計到貨日').trim() || '未定';
+            if (qty > 0) {
+                if (!tempMap[sku]) tempMap[sku] = { total: 0, batches: [] };
+                tempMap[sku].total += qty;
+                tempMap[sku].batches.push({ qty, po, date: arrivalDate });
+            }
+        });
+        // 每個商品內部的多批 PO 依照預計到貨日由近到遠排序
+        Object.keys(tempMap).forEach(sku => {
+            tempMap[sku].batches.sort((a, b) => a.date.localeCompare(b.date));
+        });
+        poArrivalMap = tempMap;
+        filterAndRender(); // 抓完預計到貨表後即時更新畫面數字
+    } catch (e) {
+        console.error("預計到貨資料載入失敗", e);
+    }
+}
+
+function showPoDetails(sku) {
+    const p = productsMap[sku];
+    const name = p ? getVal(p, '商品名稱') : '';
+    const poInfo = poArrivalMap[sku];
+    if (!poInfo || !poInfo.batches || poInfo.batches.length === 0) return;
+
+    let rowsHtml = poInfo.batches.map((b, idx) => `
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; border-bottom: 1px dashed #dce1e7; background: ${idx % 2 === 0 ? '#ffffff' : '#f8f9fa'};">
+            <div style="text-align: left;">
+                <div style="font-size: 0.95rem; font-weight: 800; color: #2c3e50;">🗓️ ${b.date}</div>
+                <div style="font-size: 0.8rem; color: #7f8c8d; font-family: monospace; margin-top: 2px;">PO單號：${b.po}</div>
+            </div>
+            <div style="font-size: 1.15rem; font-weight: 900; color: #2980b9; background: #e1f0fa; padding: 4px 12px; border-radius: 8px;">
+                +${b.qty} 件
+            </div>
+        </div>
+    `).join('');
+
+    Swal.fire({
+        title: `<div style="font-size: 1.1rem; color: #2c3e50; line-height: 1.4;">${name}</div><div style="font-size: 0.85rem; color: #7f8c8d; font-family: monospace; margin-top: 4px;">SKU: ${sku}</div>`,
+        html: `
+            <div style="background: #fff3cd; color: #856404; font-size: 0.85rem; font-weight: bold; padding: 8px 12px; border-radius: 8px; border: 1px solid #ffeeba; margin-bottom: 12px;">
+                📅 此數據更新日期為 ${poReportUpdateDate}
+            </div>
+            <div style="border: 1px solid #e9ecef; border-radius: 10px; overflow: hidden; max-height: 50vh; overflow-y: auto;">
+                ${rowsHtml}
+            </div>
+            <div style="margin-top: 12px; text-align: right; font-size: 1rem; font-weight: 900; color: #16a085;">
+                在途總計：${poInfo.total} 件（共 ${poInfo.batches.length} 批）
+            </div>
+        `,
+        confirmButtonText: '關閉',
+        confirmButtonColor: '#2c3e50',
+        width: '420px'
+    });
 }
 
 async function fetchCustomerDemands() {
@@ -552,23 +640,27 @@ function openWizard() { document.getElementById('wizardSpecificResult').style.di
 function refreshWizard() { scanNext5Days(); document.getElementById('wizardSpecificResult').style.display = 'none'; }
 function filterAndRender() {
 const query = document.getElementById('searchInput').value.toLowerCase().trim();
-const onlyYangmei = document.getElementById('stockFilter').checked; const onlyShopStock = document.getElementById('shopStockFilter').checked;
+const onlyYangmei = document.getElementById('stockFilter').checked; const onlyPoArrival = document.getElementById('poArrivalFilter').checked;
+const onlyShopStock = document.getElementById('shopStockFilter').checked;
 const onlyShopShow = document.getElementById('shopShowFilter').checked; const onlyWithPhoto = document.getElementById('photoOnlyFilter').checked;
 const specialFilter = document.getElementById('specialFilter').value;
 currentFiltered = products.filter(p => {
-const sku = getVal(p, 'SKU').toLowerCase(); const name = getVal(p, '商品名稱').toLowerCase();
+const rawSku = getVal(p, 'SKU'); const skuLower = rawSku.toLowerCase(); const paddedSku = rawSku.trim().padStart(9, '0');
+const name = getVal(p, '商品名稱').toLowerCase();
 const ymStock = parseInt(getVal(p, '楊梅庫存') || '0'); const h630Stock = parseInt(getVal(p, 'HOLA630庫存') || '0'); const h630Show = parseInt(getVal(p, 'HOLA630展示') || '0');
-const statusRaw = getVal(p, '商品狀態') || ''; const matchText = sku.includes(query) || name.includes(query);
+const poQty = poArrivalMap[paddedSku] ? poArrivalMap[paddedSku].total : 0;
+const statusRaw = getVal(p, '商品狀態') || ''; const matchText = skuLower.includes(query) || name.includes(query);
 const hasPhoto = Object.values(p).some(val => typeof val === 'string' && val.includes('有照片'));
-let matchYangmei = onlyYangmei ? (ymStock > 0) : true; let matchShopStock = onlyShopStock ? (h630Stock > 0) : true; let matchShopShow = onlyShopShow ? (h630Show > 0) : true; let matchPhoto = onlyWithPhoto ? hasPhoto : true; let passSpecial = true;
-if (specialFilter === 'negative') { passSpecial = (h630Stock < 0 || h630Show < 0); matchShopStock = matchShopShow = matchYangmei = matchPhoto = true; }
-else if (specialFilter === 'stock_no_show') { passSpecial = (h630Stock > 0 && h630Show === 0 && !name.includes('毯')); matchShopStock = matchShopShow = matchYangmei = matchPhoto = true; }
-else if (specialFilter === 'clearance') { passSpecial = (statusRaw.toUpperCase() === 'D' && (h630Stock > 0 || h630Show > 0)); matchShopStock = matchShopShow = matchYangmei = matchPhoto = true; }
-else if (specialFilter === 'display_recommend') { passSpecial = (ymStock > 0 && h630Show === 0); matchShopStock = matchShopShow = matchYangmei = matchPhoto = true; }
-else if (specialFilter === 'photo_missing') { passSpecial = (h630Show > 0 && !hasPhoto); matchShopStock = matchShopShow = matchYangmei = matchPhoto = true; }
-return matchText && matchYangmei && matchShopStock && matchShopShow && matchPhoto && passSpecial;
+let matchYangmei = onlyYangmei ? (ymStock > 0) : true; let matchPoArrival = onlyPoArrival ? (poQty > 0) : true;
+let matchShopStock = onlyShopStock ? (h630Stock > 0) : true; let matchShopShow = onlyShopShow ? (h630Show > 0) : true; let matchPhoto = onlyWithPhoto ? hasPhoto : true; let passSpecial = true;
+if (specialFilter === 'negative') { passSpecial = (h630Stock < 0 || h630Show < 0); matchShopStock = matchShopShow = matchYangmei = matchPoArrival = matchPhoto = true; }
+else if (specialFilter === 'stock_no_show') { passSpecial = (h630Stock > 0 && h630Show === 0 && !name.includes('毯')); matchShopStock = matchShopShow = matchYangmei = matchPoArrival = matchPhoto = true; }
+else if (specialFilter === 'clearance') { passSpecial = (statusRaw.toUpperCase() === 'D' && (h630Stock > 0 || h630Show > 0)); matchShopStock = matchShopShow = matchYangmei = matchPoArrival = matchPhoto = true; }
+else if (specialFilter === 'display_recommend') { passSpecial = (ymStock > 0 && h630Show === 0); matchShopStock = matchShopShow = matchYangmei = matchPoArrival = matchPhoto = true; }
+else if (specialFilter === 'photo_missing') { passSpecial = (h630Show > 0 && !hasPhoto); matchShopStock = matchShopShow = matchYangmei = matchPoArrival = matchPhoto = true; }
+return matchText && matchYangmei && matchPoArrival && matchShopStock && matchShopShow && matchPhoto && passSpecial;
 });
-document.getElementById('dataCount').innerText = query || onlyYangmei || onlyShopStock || onlyShopShow || onlyWithPhoto || specialFilter ? `過濾結果：${currentFiltered.length} 筆` : `共載入 ${products.length} 筆商品資料`;
+document.getElementById('dataCount').innerText = query || onlyYangmei || onlyPoArrival || onlyShopStock || onlyShopShow || onlyWithPhoto || specialFilter ? `過濾結果：${currentFiltered.length} 筆` : `共載入 ${products.length} 筆商品資料`;
 renderLimit = 100; renderProducts();
 }
 function renderProducts() {
@@ -576,8 +668,14 @@ const container = document.getElementById('gridContainer'); container.innerHTML 
 const listToRender = currentFiltered.slice(0, renderLimit);
 if (listToRender.length === 0) { container.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #888;">查無符合條件的商品。</div>'; return; }
 listToRender.forEach(p => {
-const sku = getVal(p, 'SKU') || 'N/A'; const name = getVal(p, '商品名稱') || '無品名';
+const sku = getVal(p, 'SKU') || 'N/A'; const paddedSku = sku !== 'N/A' ? sku.trim().padStart(9, '0') : '';
+const name = getVal(p, '商品名稱') || '無品名';
 const ymStock = parseInt(getVal(p, '楊梅庫存') || '0'); const h630Stock = parseInt(getVal(p, 'HOLA630庫存') || '0'); const h630Show = parseInt(getVal(p, 'HOLA630展示') || '0');
+const poTotal = (paddedSku && poArrivalMap[paddedSku]) ? poArrivalMap[paddedSku].total : 0;
+const sellableStock = ymStock + poTotal;
+const poValHtml = poTotal > 0
+    ? `<span class="stock-val po-clickable" onclick="showPoDetails('${paddedSku}')" title="點擊查看分批到貨明細">${poTotal}</span>`
+    : `<span class="stock-val">0</span>`;
 const origPrice = getVal(p, '一般售價') || '0';
 let rawPromoPrice = getVal(p, '促銷售價'); if(rawPromoPrice === '#N/A' || rawPromoPrice === '0') rawPromoPrice = '';
 let rawPromoPeriod = getVal(p, '促銷期間'); if(rawPromoPeriod === '#N/A') rawPromoPeriod = '';
@@ -595,10 +693,16 @@ const card = document.createElement('div'); card.className = 'card';
 card.innerHTML = `
 <div>
 <div class="card-header"><span class="sku-tag">SKU: ${sku}</span><div class="item-name">${name}</div></div>
-<div class="stock-section">
+<div class="stock-wrapper">
+<div class="stock-row-top">
 <div class="stock-box"><span class="stock-title">楊梅庫存</span><span class="stock-val ${ymStock > 0 ? 'has-stock' : ''}">${ymStock}</span></div>
+<div class="stock-box"><span class="stock-title">PO到貨</span>${poValHtml}</div>
+<div class="stock-box"><span class="stock-title">可銷售量</span><span class="stock-val ${sellableStock > 0 ? 'sellable-has' : ''}">${sellableStock}</span></div>
+</div>
+<div class="stock-row-bottom">
 <div class="stock-box"><span class="stock-title">HOLA630</span><span class="stock-val ${h630Stock > 0 ? 'has-stock' : (h630Stock < 0 ? 'negative-stock' : '')}">${h630Stock}</span></div>
 <div class="stock-box"><span class="stock-title">630展示</span><span class="stock-val ${h630Show > 0 ? 'has-stock' : (h630Show < 0 ? 'negative-stock' : '')}">${h630Show}</span></div>
+</div>
 </div>
 <div class="price-section">
 <div class="price-row"><span class="price-label">一般售價</span><span class="${promoPrice ? 'price-orig' : 'price-promo'}">$${origPrice}</span></div>
@@ -632,6 +736,7 @@ container.appendChild(btnDiv);
 function loadMore() { renderLimit += 100; renderProducts(); }
 document.getElementById('searchInput').addEventListener('input', filterAndRender);
 document.getElementById('stockFilter').addEventListener('change', filterAndRender);
+document.getElementById('poArrivalFilter').addEventListener('change', filterAndRender);
 document.getElementById('shopStockFilter').addEventListener('change', filterAndRender);
 document.getElementById('shopShowFilter').addEventListener('change', filterAndRender);
 document.getElementById('photoOnlyFilter').addEventListener('change', filterAndRender);
@@ -939,7 +1044,7 @@ html5QrCodeInv.scanFile(file, true).then(decodedText => { document.getElementByI
 const html5QrCode = new Html5Qrcode("hiddenReader");
 document.getElementById('cameraBtn').addEventListener('click', () => { document.getElementById('qrInput').click(); });
 document.getElementById('qrInput').addEventListener('change', event => {
-if (event.target.files.length == 0) return; const file = event.target.files[0]; document.getElementById('scanStatus').style.display = 'block';
+if (event.target.files.length === 0) return; const file = event.target.files[0]; document.getElementById('scanStatus').style.display = 'block';
 html5QrCode.scanFile(file, true).then(decodedText => { document.getElementById('scanStatus').style.display = 'none'; let targetSku = null; const pMatch = decodedText.match(/\/p\/(0\d{8})/i); const blindMatch = decodedText.match(/(0\d{8})(?=\D|$)/); targetSku = pMatch ? pMatch[1] : (blindMatch ? blindMatch[1] : null); if (targetSku) { let searchBox = document.getElementById('searchInput'); searchBox.value = targetSku; searchBox.dispatchEvent(new Event('input')); } else alert("解析失敗"); }).catch(() => { document.getElementById('scanStatus').style.display = 'none'; alert("照片解析失敗。"); }).finally(() => { event.target.value = ''; });
 });
 fetchProducts();
