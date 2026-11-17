@@ -429,7 +429,7 @@ products = parseCSVOptimized(lines, headers);
 products.forEach(p => { const sku = getVal(p, 'SKU'); if(sku) productsMap[sku] = p; });
 document.getElementById('loader').style.display = 'none'; document.getElementById('searchInput').disabled = false;
 filterAndRender();
-fetchPoArrivals();
+await fetchPoArrivals();
 fetchCustomerDemands();
 } catch (error) { document.getElementById('loader').innerText = '資料載入失敗，請確認網址或試算表狀態。'; }
 }
@@ -520,13 +520,24 @@ async function fetchCustomerDemands() {
 function checkSniperRadar(demands) {
     let alerts = [];
     demands.forEach(d => {
-        const customer = getVal(d, '顧客稱呼'); const sku = String(getVal(d, 'SKU')).padStart(9, '0'); const condition = getVal(d, '條件'); const note = getVal(d, 'LINE備註');
+        const customer = getVal(d, '顧客稱呼'); const sku = String(getVal(d, 'SKU')).trim().padStart(9, '0');
+        const condition = getVal(d, '條件').replace(/＜/g, '<').replace(/＞/g, '>').replace(/＝/g, '=');
+        const note = getVal(d, 'LINE備註');
         const product = productsMap[sku];
         if (product && condition && customer) {
             const match = condition.match(/(.*?)([<>=]+)(.*)/);
             if (match) {
                 const field = match[1].trim(); const op = match[2].trim(); const val = parseFloat(match[3].trim());
-                let pVal = (field.includes('價格') || field.includes('售價')) ? getRawPriceOnDate(product, new Date()) : (parseFloat(getVal(product, field)) || 0);
+                let pVal = 0;
+                if (field.includes('價格') || field.includes('售價')) {
+                    pVal = getRawPriceOnDate(product, new Date());
+                } else if (field === 'PO到貨') {
+                    pVal = poArrivalMap[sku] ? poArrivalMap[sku].total : 0;
+                } else if (field === '可銷售量') {
+                    pVal = (parseFloat(getVal(product, '楊梅庫存')) || 0) + (poArrivalMap[sku] ? poArrivalMap[sku].total : 0);
+                } else {
+                    pVal = parseFloat(getVal(product, field)) || 0;
+                }
                 let isHit = false;
                 if (op === '<=' && pVal <= val) isHit = true; if (op === '<' && pVal < val) isHit = true;
                 if (op === '>=' && pVal >= val) isHit = true; if (op === '>' && pVal > val) isHit = true; if ((op === '==' || op === '=') && pVal === val) isHit = true;
